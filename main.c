@@ -6,8 +6,6 @@
 #include "headers/decoder.h"
 
 
-
-
 void Test(void) {
 
 }
@@ -23,7 +21,6 @@ int main(int argc, char** argv) {
     PrintBinary(GneratorPoly);
     PrintBinary(0x555<<11);
     PrintBinary(GetSyndrome(0x1));
-    getchar();
 
     return EXIT_SUCCESS;
 }
