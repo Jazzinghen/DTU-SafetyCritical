@@ -46,18 +46,15 @@ int GetParity(unsigned long CodeWord) {
 }
 
 unsigned long RotL(unsigned long CodeWord, int i) {
-         int l;
          while(i--) {
-
+                    CodeWord = (CodeWord<<1) | !(!(CodeWord & 0x400000));         
          }
-         return CodeWord;             
+         return CodeWord & 0x7fffff;             
 }
 
 unsigned long RotR(unsigned long CodeWord, int i) {
          
 }
-
-
 
 void Correction(void) {
      
@@ -72,6 +69,16 @@ void Test(void) {
 }
 
 int main(void) {
+    
+     PrintBinary(RotL(0xf00,1)); 
+     PrintBinary(RotL(0xf00,2));
+     PrintBinary(RotL(0xf00,0)); 
+     PrintBinary(RotL(0xf00,10));
+     PrintBinary(RotL(0xf00,11));
+     PrintBinary(RotL(0xf00,12));
+     PrintBinary(RotL(0xf00,13));
+     PrintBinary(RotL(0xf00,14));     
+                  
     printf("%d\n", GetParity(0)); 
     printf("%d\n", GetParity(0x1));
     printf("%d\n", GetParity(0x2));
