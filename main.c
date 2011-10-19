@@ -24,18 +24,61 @@ unsigned long GetSyndrome(unsigned long CodeWord) {
      return(CodeWord);
 }
 
+//Counting 1-bits, "divide and conquer" strategy.
+//from boook: Hackers delight p. 95;
+int Weight(unsigned long CodeWord) {
+    CodeWord = CodeWord - ((CodeWord >> 1) & 0x55555555);
+    CodeWord = (CodeWord & 0x33333333) + ((CodeWord >> 2) & 0x33333333);
+    CodeWord = (CodeWord + (CodeWord >> 4)) & 0x0F0F0F0F;
+    CodeWord = CodeWord + (CodeWord >> 8);
+    CodeWord = CodeWord + (CodeWord >> 16);
+    
+    return CodeWord & 0x0000003F;
+}
+
+//Computing the Parity of a Word
+//from boook: Hackers delight p. 105;
 int GetParity(unsigned long CodeWord) {
-     int i,p = 0;
-     for (i = 1; i<=32; i++, CodeWord>>=1) {
-         if(CodeWord & 1) {
-             p^=1; 
-         }   
-     }      
-     return p;    
+    CodeWord = CodeWord ^ (CodeWord >> 1);
+    CodeWord = (CodeWord ^ (CodeWord >> 2)) & 0x11111111;
+    CodeWord = CodeWord*0x11111111;
+    return((CodeWord >> 28) & 1); 
+}
+
+unsigned long RotL(unsigned long CodeWord, int i) {
+         int l;
+         while(i--) {
+
+         }
+         return CodeWord;             
+}
+
+unsigned long RotR(unsigned long CodeWord, int i) {
+         
+}
+
+
+
+void Correction(void) {
+     
+}
+
+void Decoder(void) {
+     
+}
+
+void Test(void) {
+     
 }
 
 int main(void) {
-       
+    printf("%d\n", GetParity(0)); 
+    printf("%d\n", GetParity(0x1));
+    printf("%d\n", GetParity(0x2));
+    printf("%d\n", GetParity(0x3));  
+    printf("%d\n", GetParity(0xf4)); 
+    printf("%d\n", GetParity(0xffff));   
+     
     PrintBinary(GneratorPoly);
     PrintBinary(0x555<<11);
     PrintBinary(GetSyndrome(0x1));
