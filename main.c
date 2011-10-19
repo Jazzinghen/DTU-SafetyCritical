@@ -6,18 +6,22 @@
 #include "headers/decoder.h"
 
 void Test(void) {
-
+	uint8_t i;
+	uint32_t error_mask_arr[] = {0x00, 0x01,0x03,0x07};
+	
+	uint32_t error_mask; 
+	
+	for(i = 1; i <= 1; i++) {
+		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
+			PrintBinary(error_mask);	
+		}
+	}
 }
 
 int main(int argc, char** argv) {
 	uint8_t i;
 	
-	uint32_t v = 3; // current permutation of bits 
-	for ( i = 0; i < 100; i++) {
-		PrintBinary(v);
-		v = NextBitPermutation(v);
-	}
-	
+	Test();
 /*	for (i = 0; i<32; i++) {
     	PrintBinary(RotR(0x55,i));
 	}	
@@ -26,11 +30,11 @@ int main(int argc, char** argv) {
 	}*/
 
 
-    PrintBinary(GneratorPoly);
-    PrintBinary(0x555<<11);
-    PrintBinary(GetSyndrome(0x1));
+	PrintBinary(GneratorPoly);
+	PrintBinary(0x555<<11);
+	PrintBinary(GetSyndrome(0x1));
 
 	getchar();
 
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
