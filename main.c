@@ -14,7 +14,7 @@ void PrintBinary(unsigned long CodeWord) {
      puts("");
 }
 
-unsigned long GetSyndom(unsigned long CodeWord) {
+unsigned long GetSyndrome(unsigned long CodeWord) {
      int i;
      for (i = 1; i<=12; i++, CodeWord>>=1) {
          if(CodeWord & 1) {
@@ -24,9 +24,20 @@ unsigned long GetSyndom(unsigned long CodeWord) {
      return(CodeWord);
 }
 
+int GetParity(unsigned long CodeWord) {
+     int i,p = 0;
+     for (i = 1; i<=32; i++, CodeWord>>=1) {
+         if(CodeWord & 1) {
+             p^=1; 
+         }   
+     }      
+     return p;    
+}
+
 int main(void) {
+       
     PrintBinary(GneratorPoly);
     PrintBinary(0x555<<11);
-    PrintBinary(GetSyndom(0x1));
+    PrintBinary(GetSyndrome(0x1));
     getchar();
 }
