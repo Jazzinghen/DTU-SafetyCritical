@@ -45,13 +45,15 @@ uint32_t GetSyndrome(uint32_t CodeWord) {
 }
 
 uint32_t RotL(uint32_t CodeWord, int32_t i) {
-         int32_t l;
-         while(i--) {
-
-         }
-         return CodeWord;
+	while(i--) {
+		CodeWord = (CodeWord << 1) | CodeWord >> 22;
+	}
+	return (CodeWord & 0x7fffff);
 }
 
 uint32_t RotR(uint32_t CodeWord, int32_t i) {
-
+	while(i--) {
+		CodeWord = (CodeWord >> 1) | CodeWord << 22;
+	}
+	return (CodeWord & 0x7fffff);
 }
