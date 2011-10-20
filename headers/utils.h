@@ -13,6 +13,9 @@
 #define DECODE_FIXED                2
 #define DECODE_SYNDROME_ERRORS      3
 
+#define ALGORITHM_IS_CORRECT		0
+#define ALGORITHM_IS_NOT_CORRECT	1
+
 typedef union {
   uint32_t CodeWord;
   struct {
