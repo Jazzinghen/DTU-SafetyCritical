@@ -11,7 +11,7 @@ void Test(void) {
 	
 	uint32_t error_mask; 
 	
-	for(i = 1; i <= 1; i++) {
+	for(i = 1; i <= 2; i++) {
 		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
 			PrintBinary(error_mask);	
 		}
@@ -22,9 +22,10 @@ int main(int argc, char** argv) {
 	uint8_t i;
 	
 	Test();
-/*	for (i = 0; i<32; i++) {
+	
+	/*for (i = 0; i<32; i++) {
     	PrintBinary(RotR(0x55,i));
-	}	
+	}
 	for (i = 0; i<32; i++) {
     	PrintBinary(RotL(0x55,i));
 	}*/
