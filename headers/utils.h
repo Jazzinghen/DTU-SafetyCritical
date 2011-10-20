@@ -12,7 +12,7 @@ typedef union {
     uint16_t data   : 12;
     uint16_t check  : 12;
   } cw;
-} GolayCw;
+} GolayCW;
 
 void PrintBinary(uint32_t CodeWord);
 
