@@ -8,6 +8,9 @@ void PrintBinary(unsigned long CodeWord) {
      int i;
      for(i = 31; i >= 0; i--) {
            printf("%d", (CodeWord>>i)&0x01);
+        	if(!(i%8)) {
+				printf(" ");
+			}
      }
      puts("");
 }
@@ -259,7 +262,7 @@ int main(void)
   int
     error_count;       /* receives number of errors corrected */
     PrintBinary(golay(0x555));
-    
+    getchar();
     
   virgin_codeword=golay(0x555); /* make a test codeword */
   if (parity(virgin_codeword))

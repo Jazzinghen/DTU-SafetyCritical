@@ -25,12 +25,11 @@ void Test(void) {
 int main(int argc, char** argv) {
 	uint8_t i;
 	GolayCW cw;
+	
 	cw.CodeWord = 0;
-	cw.cw.data  = 0xfff;	
-	cw.cw.check = 0xfff;
-	cw.cw.parity = 0xfff;
-	//Encode(cw);
-	;
+	cw.cw.data  = 0x555;	
+	PrintBinary(cw.CodeWord);
+	Encode(&cw);
 	PrintBinary(cw.CodeWord);
 	PrintBinary(cw.cw.check);
 	
