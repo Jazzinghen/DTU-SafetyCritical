@@ -31,6 +31,21 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../decoder.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../encoder.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../headers/decoder.h" />
+		<Unit filename="../headers/encoder.h" />
+		<Unit filename="../headers/utils.h" />
+		<Unit filename="../main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />
