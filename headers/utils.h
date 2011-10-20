@@ -8,9 +8,9 @@
 typedef union {
   uint32_t CodeWord;
   struct {
-    uint8_t parity  : 1;
     uint16_t data   : 12;
     uint16_t check  : 12;
+    uint8_t parity  : 1;
   } cw;
 } GolayCW;
 

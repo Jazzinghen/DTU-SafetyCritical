@@ -23,6 +23,15 @@ void Test(void) {
 int main(int argc, char** argv) {
 	uint8_t i;
 	
+	GolayCW cw;
+	
+	cw.CodeWord = 0x00;
+	cw.cw.data = 0xfff;
+	PrintBinary(cw.CodeWord);
+	PrintBinary(cw.CodeWord);
+	
+	getchar();
+	
 	Test();
 	
 	/*for (i = 0; i<32; i++) {
