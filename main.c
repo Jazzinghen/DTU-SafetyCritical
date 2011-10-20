@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 	cw.cw.data = 0x555^0x2;
 	cw.cw.parity = 0;
 	PrintBinary(cw.CodeWord);
-	printf ("%d\n After Correction:\n", decode(CORRECT_ERRORS, &err, &cw));
+	printf ("%d\n After Correction:\n", Correction(GOLAY_24, &cw));
 	PrintBinary(cw.CodeWord);
 
 	getchar();
