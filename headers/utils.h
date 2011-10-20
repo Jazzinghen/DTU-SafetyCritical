@@ -5,6 +5,15 @@
 
 #define GneratorPoly        0xAE3 // Another alternative would be to use the codeword 0xC75
 
+typedef union {
+  uint32_t CodeWord;
+  struct {
+    uint8_t parity  : 1;
+    uint16_t data   : 12;
+    uint16_t check  : 12;
+  } cw;
+} GolayCW;
+
 void PrintBinary(uint32_t CodeWord);
 
 int32_t Weight (uint32_t CodeWord);
