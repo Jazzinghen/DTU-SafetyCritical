@@ -4,6 +4,6 @@ void Correction(void) {
 
 }
 
-void Decoder(void) {
+void Decode(void) {
 
 }

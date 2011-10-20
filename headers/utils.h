@@ -16,5 +16,4 @@ uint32_t RotR (uint32_t CodeWord, int32_t i);
 
 uint32_t NextBitPermutation(uint32_t word);
 
-
 #endif // UTILS_H_INCLUDED
