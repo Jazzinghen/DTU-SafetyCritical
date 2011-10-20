@@ -9,6 +9,7 @@ uint8_t Test(uint32_t x) {
 	uint8_t i;
 	uint32_t error_mask_arr[] = {0x00, 0x01,0x03,0x07, 0x0f};
 	uint32_t error_mask;
+	uint8_t error_status;
 
 	GolayCW CodeWord1, CodeWord2;
 	CodeWord1.CodeWord = x;
@@ -20,13 +21,17 @@ uint8_t Test(uint32_t x) {
 		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
 			CodeWord1.CodeWord = CodeWord2.CodeWord ^ error_mask;
 			//PrintBinary(CodeWord1.CodeWord);
-			Correction(GOLAY_24, &CodeWord1);
+			error_status = Correction(GOLAY_24, &CodeWord1);
 			if(CodeWord2.CodeWord ^ CodeWord1.CodeWord) {
-				//puts("fuck me");
-				//PrintBinary(error_mask);
-				//PrintBinary(CodeWord1.CodeWord);
-				//PrintBinary(CodeWord2.CodeWord);
-				//PrintBinary(CodeWord2.CodeWord ^ CodeWord1.CodeWord);
+
+        /*printf("Something Went Wrong.\n I had this Mask:\n");
+          PrintBinary(error_mask);
+				printf("The Injected Codeword Was:\n");
+          PrintBinary(CodeWord1.CodeWord);
+				printf("The Correct one was:\n");
+          PrintBinary(CodeWord2.CodeWord);*/
+        printf ("Something went wrong. Status: %d\n", error_status);
+        PrintBinary(CodeWord2.CodeWord ^ CodeWord1.CodeWord);
 				return ALGORITHM_IS_NOT_CORRECT;
 			}
 		}
@@ -39,13 +44,13 @@ int main(int argc, char** argv) {
 	GolayCW cw;
 
 	for(i = 0xf00; i<=0xfff; i++) {
-		printf("%d", Test(i));
-		if(!(i%4)) {
-			puts("");	
-		}
-		
+		Test(i);
+		/*if(!(i%4)) {
+			puts("");
+		}*/
+
 	}
-	
+
 	cw.CodeWord = 0x555;
 	PrintBinary(cw.CodeWord);
 	getchar();

@@ -10,7 +10,7 @@ uint8_t ErrorCheck (uint8_t parity_mode, GolayCW *codeWord){
   }
 
   if (GetSyndrome(codeWord->CodeWord) > 0) {
-        return(DECODE_SYNDROME_ERRORS);
+      return(DECODE_SYNDROME_ERRORS);
   } else {
       return(DECODE_NO_ERRORS); /* no errors */
   }
@@ -39,6 +39,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
     if (parity_mode == GOLAY_24){
       parity_bit = codeWord->cw.parity;
       codeWord->cw.parity = 0;
+      tempCW.cw.parity = 0;
     }
 
     limitWeight = 3;                /* initial syndrome weight threshold */
@@ -93,6 +94,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
 
   *codeWord = tempCW;
   if (parity_mode == GOLAY_24){
+    tempCW.cw.parity = parity_bit;
     if (GetParity(codeWord->CodeWord) > 0){            /* odd parity is an error */
       return(DECODE_PARITY_ERRORS);
     }
