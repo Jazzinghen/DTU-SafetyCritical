@@ -61,6 +61,6 @@ uint32_t RotR(uint32_t CodeWord, int32_t i) {
 //http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation
 //ret: next permutation of bits
 uint32_t NextBitPermutation(uint32_t word) {
-	uint32_t t = (word | (word - 1)) + 1;  
-	return t | ((((t & -t) / (word & -word)) >> 1) - 1);  
+	uint32_t t = (word | (word - 1)) + 1;
+	return t | ((((t & -t) / (word & -word)) >> 1) - 1);
 }

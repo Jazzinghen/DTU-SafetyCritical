@@ -8,7 +8,7 @@
    returning 0 if no errors exist, 1 if an overall parity error exists, and
    2 if a codeword error exists. */
 
-uint8_t decode(uint8_t correct_mode, uint8_t *errors, GolayCW *codeWord){
+uint8_t Decode (uint8_t correct_mode, uint8_t *errors, GolayCW *codeWord){
 
   uint32_t parity_bit;
 
@@ -77,7 +77,7 @@ uint8_t Correction (GolayCW *codeWord)
           limitWeight = 2; /* lower the threshold while bit diddling */
         }
 
-      syndrome = GetSyndrome(codeWord->CodeWord); /* look for errors */
+      syndrome = (GetSyndrome(codeWord->CodeWord) << 12); /* look for errors */
       if (syndrome > 0) /* errors exist */
         {
           for (i=0; i<23; i++) {/* check syndrome of each cyclic shift */
@@ -89,7 +89,7 @@ uint8_t Correction (GolayCW *codeWord)
               else
                 {
                   codeWord->CodeWord = RotL(codeWord->CodeWord,1);   /* rotate to next pattern */
-                  syndrome = GetSyndrome(codeWord->CodeWord);         /* calc new syndrome */
+                  syndrome = (GetSyndrome(codeWord->CodeWord) << 12);         /* calc new syndrome */
                 }
             }
           j++; /* toggle next trial bit */
