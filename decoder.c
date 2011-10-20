@@ -1,4 +1,5 @@
 #include "headers/utils.h"
+#include "headers/decoder.h"
 
 /* This function decodes codeword *cw in one of two modes. If correct_mode
    is nonzero, error correction is attempted, with *errs set to the number of
@@ -16,7 +17,7 @@ uint8_t decode(uint8_t correct_mode, uint8_t *errors, GolayCW *codeWord){
       parity_bit = codeWord->cw.parity; /* save parity bit */
       codeWord->cw.parity = 0;            /* remove parity bit for correction */
 
-      errors = Correction(codeWord);     /* correct up to three bits */
+      *errors = Correction(codeWord);     /* correct up to three bits */
       codeWord->cw.parity = parity_bit;            /* restore parity bit */
 
       /* check for 4 bit errors */
@@ -34,7 +35,7 @@ uint8_t decode(uint8_t correct_mode, uint8_t *errors, GolayCW *codeWord){
         }
       if (GetSyndrome(codeWord->CodeWord) > 0)
         {
-          *errs=1;
+          *errors=1;
           return(DECODE_SYNDROME_ERRORS);
         }
       else

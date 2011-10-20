@@ -32,6 +32,13 @@ int main(int argc, char** argv) {
 	Encode(&cw);
 	PrintBinary(cw.CodeWord);
 	PrintBinary(cw.cw.check);
+	uint8_t err = 0;
+	PrintBinary(cw.CodeWord);
+	cw.cw.data = 0x555^0x1;
+	cw.cw.parity = 0;
+	PrintBinary(cw.CodeWord);
+	printf ("%d\n After Correction:\n", decode(CORRECT_ERRORS, &err, &cw));
+	PrintBinary(cw.CodeWord);
 	
 	getchar();
 	
