@@ -35,15 +35,15 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
 
   tempCW = *codeWord;         /* save */
 
-  if (parity_mode == GOLAY_24){
-    parity_bit = codeWord->cw.parity;
-    codeWord->cw.parity = 0;
-  }
+  if (ErrorCheck(parity_mode, codeWord) != DECODE_NO_ERRORS){
+    if (parity_mode == GOLAY_24){
+      parity_bit = codeWord->cw.parity;
+      codeWord->cw.parity = 0;
+    }
 
-  limitWeight = 3;                /* initial syndrome weight threshold */
-  j = -1;               /* -1 = no trial bit flipping on first pass */
-  mask = 1;
-  if (GetSyndrome(codeWord->CodeWord) > 0) {
+    limitWeight = 3;                /* initial syndrome weight threshold */
+    j = -1;               /* -1 = no trial bit flipping on first pass */
+    mask = 1;
     while (j < 23) {
       if (j != -1) /* toggle a trial bit */
         {
