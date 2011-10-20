@@ -4,12 +4,14 @@
 #include <stdint.h>
 
 #define GneratorPoly                0xAE3 // Another alternative would be to use the codeword 0xC75
-#define DETECT_ERRORS               0
-#define CORRECT_ERRORS              1
+
+#define GOLAY_23                    0
+#define GOLAY_24                    1
 
 #define DECODE_NO_ERRORS            0
 #define DECODE_PARITY_ERRORS        1
-#define DECODE_SYNDROME_ERRORS      2
+#define DECODE_FIXED                2
+#define DECODE_SYNDROME_ERRORS      3
 
 typedef union {
   uint32_t CodeWord;

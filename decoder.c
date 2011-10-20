@@ -1,46 +1,19 @@
 #include "headers/utils.h"
 #include "headers/decoder.h"
 
-/* This function decodes codeword *cw in one of two modes. If correct_mode
-   is nonzero, error correction is attempted, with *errs set to the number of
-   bits corrected, and returning 0 if no errors exist, or 1 if parity errors
-   exist. If correct_mode is zero, error detection is performed on *cw,
-   returning 0 if no errors exist, 1 if an overall parity error exists, and
-   2 if a codeword error exists. */
+uint8_t ErrorCheck (uint8_t parity_mode, GolayCW *codeWord){
 
-uint8_t Decode (uint8_t correct_mode, uint8_t *errors, GolayCW *codeWord){
-
-  uint32_t parity_bit;
-
-  if (correct_mode == CORRECT_ERRORS)               /* correct errors */
-    {
-      parity_bit = codeWord->cw.parity; /* save parity bit */
-      codeWord->cw.parity = 0;            /* remove parity bit for correction */
-
-      *errors = Correction(codeWord);     /* correct up to three bits */
-      codeWord->cw.parity = parity_bit;            /* restore parity bit */
-
-      /* check for 4 bit errors */
-      if (GetParity(codeWord->CodeWord) > 0)            /* odd parity is an error */
-        return(DECODE_PARITY_ERRORS);
-      return(DECODE_NO_ERRORS); /* no errors */
-    }
-  else /* detect errors only */
-    {
-      *errors = 0;
-      if (GetParity(codeWord->CodeWord) > 0) /* odd parity is an error */
-        {
-          *errors = 1;
+  if (parity_mode == GOLAY_24){
+      if (GetParity(codeWord->CodeWord) > 0){
           return(DECODE_PARITY_ERRORS);
         }
-      if (GetSyndrome(codeWord->CodeWord) > 0)
-        {
-          *errors=1;
-          return(DECODE_SYNDROME_ERRORS);
-        }
-      else
-        return(DECODE_NO_ERRORS); /* no errors */
-    }
+  }
+
+  if (GetSyndrome(codeWord->CodeWord) > 0) {
+        return(DECODE_SYNDROME_ERRORS);
+  } else {
+      return(DECODE_NO_ERRORS); /* no errors */
+  }
 } /* decode */
 
 /* This function corrects Golay [23,12] codeword cw, returning the
@@ -49,7 +22,7 @@ uint8_t Decode (uint8_t correct_mode, uint8_t *errors, GolayCW *codeWord){
    codeword for four or more errors, possibly not the intended
    one. *errs is set to the number of bit errors corrected. */
 
-uint8_t Correction (GolayCW *codeWord)
+uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
 {
   uint8_t limitWeight;                /* current syndrome limit weight, 2 or 3 */
   uint32_t mask;             /* mask for bit flipping */
@@ -57,10 +30,16 @@ uint8_t Correction (GolayCW *codeWord)
     i,j;              /* index */
   uint32_t syndrome;                /* calculated syndrome */
   GolayCW tempCW;          /* saves initial value of cw */
-
   uint8_t errors = 0;
+  uint32_t parity_bit;
 
   tempCW = *codeWord;         /* save */
+
+  if (parity_mode == GOLAY_24){
+    parity_bit = codeWord->cw.parity;
+    codeWord->cw.parity = 0;
+  }
+
   limitWeight = 3;                /* initial syndrome weight threshold */
   j = -1;               /* -1 = no trial bit flipping on first pass */
   mask = 1;
@@ -84,7 +63,13 @@ uint8_t Correction (GolayCW *codeWord)
               if ((errors = Weight(syndrome)) <= limitWeight) {
                   codeWord->CodeWord = codeWord->CodeWord ^ syndrome;              /* remove errors */
                   codeWord->CodeWord = RotR(codeWord->CodeWord, i);  /* unrotate data */
-                  return(errors);
+                  if (parity_mode == GOLAY_24){
+                    codeWord->cw.parity = parity_bit;
+                    if (GetParity(codeWord->CodeWord) > 0){            /* odd parity is an error */
+                      return(DECODE_PARITY_ERRORS);
+                    }
+                  }
+                  return(DECODE_FIXED);
                 }
               else
                 {
@@ -94,10 +79,22 @@ uint8_t Correction (GolayCW *codeWord)
             }
           j++; /* toggle next trial bit */
         }
-      else
-        return(errors); /* return corrected codeword */
+      else {
+        if (parity_mode == GOLAY_24){
+          codeWord->cw.parity = parity_bit;
+          if (GetParity(codeWord->CodeWord) > 0){            /* odd parity is an error */
+            return(DECODE_PARITY_ERRORS);
+          }
+        }
+        return(DECODE_FIXED);
+      }
     }
 
   *codeWord = tempCW;
-  return(errors); /* return original if no corrections */
+  if (parity_mode == GOLAY_24){
+    if (GetParity(codeWord->CodeWord) > 0){            /* odd parity is an error */
+      return(DECODE_PARITY_ERRORS);
+    }
+  }
+  return (DECODE_NO_ERRORS);
 } /* correct */
