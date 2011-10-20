@@ -43,8 +43,8 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
   limitWeight = 3;                /* initial syndrome weight threshold */
   j = -1;               /* -1 = no trial bit flipping on first pass */
   mask = 1;
-  while (j < 23) /* flip each trial bit */
-    {
+  if (GetSyndrome(codeWord->CodeWord) > 0) {
+    while (j < 23) {
       if (j != -1) /* toggle a trial bit */
         {
           if (j > 0) /* restore last trial bit */
@@ -89,6 +89,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
         return(DECODE_FIXED);
       }
     }
+  }
 
   *codeWord = tempCW;
   if (parity_mode == GOLAY_24){
