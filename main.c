@@ -8,10 +8,12 @@
 void Test(void) {
 	uint8_t i;
 	uint32_t error_mask_arr[] = {0x00, 0x01,0x03,0x07};
-	
 	uint32_t error_mask; 
 	
-	uint32_t CodeWord = 0x555;
+	GolayCW CodeWord;
+	CodeWord.cw.data = 0x555;
+	Encode(&CodeWord);
+	
 	for(i = 1; i <= 2; i++) {
 		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
 			PrintBinary(error_mask);	
@@ -22,6 +24,17 @@ void Test(void) {
 
 int main(int argc, char** argv) {
 	uint8_t i;
+	GolayCW cw;
+	cw.CodeWord = 0;
+	cw.cw.data  = 0xfff;	
+	cw.cw.check = 0xfff;
+	cw.cw.parity = 0xfff;
+	//Encode(cw);
+	;
+	PrintBinary(cw.CodeWord);
+	PrintBinary(cw.cw.check);
+	
+	getchar();
 	
 	Test();
 	
