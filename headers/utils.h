@@ -5,16 +5,21 @@
 
 #define GneratorPoly                0xAE3 // Another alternative would be to use the codeword 0xC75
 
-#define GOLAY_23                    0
-#define GOLAY_24                    1
+//modes
+#define GOLAY_23                    0x00
+#define GOLAY_24                    0x01
+#define LT_ENABLED					0x02
+
+#define LT23_FILE_NAME				".LT23.lt"
+#define LT24_FILE_NAME				".LT24.lt"
 
 #define DECODE_NO_ERRORS            0
 #define DECODE_PARITY_ERRORS        1
 #define DECODE_FIXED                2
 #define DECODE_SYNDROME_ERRORS      3
 
-#define ALGORITHM_IS_CORRECT        0
-#define ALGORITHM_IS_NOT_CORRECT    1
+#define ALGORITHM_IS_CORRECT		0
+#define ALGORITHM_IS_NOT_CORRECT	1
 
 typedef union {
   uint32_t CodeWord;
