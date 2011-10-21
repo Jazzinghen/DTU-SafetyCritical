@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "headers/utils.h"
 #include "headers/encoder.h"
@@ -105,8 +106,6 @@ uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
 		fputc( cw2.CodeWord     &0xff,fp_d);
 		fputc((cw2.CodeWord>>8) &0xff,fp_d);
 		fputc((cw2.CodeWord>>16)&0xff,fp_d);
-
-
 
 		memset(src_data, 0, sizeof(src_data));
 	}
