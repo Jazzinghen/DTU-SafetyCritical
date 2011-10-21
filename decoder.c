@@ -31,7 +31,7 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 
 		Correction(mode, &cw1);
 		Correction(mode, &cw2);
-		
+
 		//printf("%d\n", Correction(mode, &cw1));
 		//printf("%d\n", Correction(mode, &cw2));
 
@@ -39,7 +39,7 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 		fputc((cw1.CodeWord>>4)&0xff, fp_d);
 		fputc((cw1.CodeWord<<4)&0xf0 | (cw2.CodeWord>>8)&0x0f, fp_d);
 		fputc((cw2.CodeWord)   &0xff, fp_d);
-		
+
 		memset(src_data, 0, sizeof(src_data));
 	}
 
@@ -187,7 +187,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
 //
 //  REMEMBER TO SHIFT THE SYNDROME BACK!!!!!
 
-size_t ComputeDLT(uint8_t mode, uint32_t * LookupTable) {
+size_t ComputeDLT(uint32_t * LookupTable) {
   uint32_t error_mask_arr[] = {0x00, 0x01, 0x03, 0x07};
 	uint32_t error_mask;
 
@@ -204,15 +204,17 @@ size_t ComputeDLT(uint8_t mode, uint32_t * LookupTable) {
 
   GolayCW tempCW;
 
-  uint8_t data [2048 * 3];
+  uint8_t data [2048 * 4];
 
-  LTFile = fopen(DLT_FILE_NAME, "r");
+  memset(LookupTable, 0, sizeof(uint32_t) * 2048);
+
+  LTFile = fopen(DLT_FILE_NAME, "rb");
 
   if (LTFile != NULL) {
     printf("Now reading Decoding Lookup Table: ");
-    res = fread(data, sizeof(uint8_t) * 3, 2048, LTFile);
+    res = fread(data, sizeof(uint8_t) * 4, 2048, LTFile);
     for (i = 0; i < 2048; i++){
-      j = i*3;
+      j = i*4;
       tempData.bytes[0] = data[j];
       tempData.bytes[1] = data[j+1];
       tempData.bytes[2] = data[j+2];
@@ -224,24 +226,27 @@ size_t ComputeDLT(uint8_t mode, uint32_t * LookupTable) {
     printf (" Done.\n");
   } else {
     printf("Now generating Decoding Lookup Table: ");
-    LTFile = fopen(DLT_FILE_NAME, "w");
+    LTFile = fopen(DLT_FILE_NAME, "wb");
     data[0] = 0;
     data[1] = 0;
     data[2] = 0;
+    data[3] = 0;
     LookupTable[0] = 0;
     for(i = 1; i <= 3; i++) {
       for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
         tempData.cw = error_mask;
-        j = (GetSyndrome(error_mask) << 12) * 3;
+        j = (GetSyndrome(error_mask)) * 4;
         data[j] = tempData.bytes[0];
         data[j+1] = tempData.bytes[1];
         data[j+2] = tempData.bytes[2];
-        LookupTable[GetSyndrome(error_mask) << 12] = error_mask;
+        data[j+3] = tempData.bytes[3];
+        LookupTable[GetSyndrome(error_mask)] = error_mask;
       }
     }
-    res = fwrite(data, sizeof(uint8_t) * 3, 2048, LTFile);
+    res = fwrite(data, sizeof(uint8_t) * 4, 2048, LTFile);
     printf (" Done.\n");
   }
 
+	fclose(LTFile);
   return res;
 }

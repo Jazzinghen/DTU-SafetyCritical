@@ -69,12 +69,9 @@ size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
       tempCW.cw.data = fakeData;
       Encode(GOLAY_24, &tempCW);
       LookupTable[fakeData].CodeWord = tempCW.CodeWord;
-      if (GetParity(LookupTable[fakeData].CodeWord)) {
-        printf("MFW!\n");
-      }
       tempData.cw = tempCW.CodeWord;
-      
-	  data[j] = tempData.bytes[0];
+
+      data[j] = tempData.bytes[0];
       data[j+1] = tempData.bytes[1];
       data[j+2] = tempData.bytes[2];
 
