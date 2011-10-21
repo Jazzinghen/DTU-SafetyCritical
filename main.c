@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
 
   cwlt.CodeWord = cw.CodeWord;
 
-	cw.cw.data = 0x555^0x2;
+	cw.cw.data = 0x555^0x1105;
 	PrintBinary(cw.CodeWord);
 
 
