@@ -50,8 +50,9 @@ int main(int argc, char** argv) {
   	ComputeELT(GOLAY_24, encLookUp);
   	ComputeDLT(decLookUp);
 
-	for(i = 0x000; i<=0x01; i++) {
+	for(i = 0x000; i<=0x0ff; i++) {
 		Test(i);
+		printf("ok\n");
 	}
 	getchar();
 
