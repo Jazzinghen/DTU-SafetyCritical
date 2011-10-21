@@ -174,5 +174,69 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
     //  No errors at all, so nothing to fix.
     return (DECODE_NO_ERRORS);
   }
-} /* correct */
+}
 
+//  Ok, this will require some more work, but I'll get it done. Quickly.
+//  The idea is to create a LUT using an error pattern as data AND a
+//  syndrome as index in the LUT for that error pattern :3
+//
+//  REMEMBER TO SHIFT THE SYNDROME BACK!!!!!
+
+size_t ComputeDLT(uint8_t mode, uint32_t * LookupTable) {
+  uint32_t error_mask_arr[] = {0x00, 0x01, 0x03, 0x07};
+	uint32_t error_mask;
+
+  uint16_t fakeData = 0;
+  uint16_t i = 0;
+  uint32_t j = 0;
+  FILE *LTFile;
+  size_t res;
+
+  union {
+    uint8_t bytes[4];
+    uint32_t cw;
+  } tempData;
+
+  GolayCW tempCW;
+
+  uint8_t data [2048 * 3];
+
+  LTFile = fopen(DLT_FILE_NAME, "r");
+
+  if (LTFile != NULL) {
+    printf("Now reading Decoding Lookup Table: ");
+    res = fread(data, sizeof(uint8_t) * 3, 2048, LTFile);
+    for (i = 0; i < 2048; i++){
+      j = i*3;
+      tempData.bytes[0] = data[j];
+      tempData.bytes[1] = data[j+1];
+      tempData.bytes[2] = data[j+2];
+      LookupTable[i] = tempData.cw;
+      if ((i%128) == 0) {
+        printf (".");
+      }
+    }
+    printf (" Done.\n");
+  } else {
+    printf("Now generating Decoding Lookup Table: ");
+    LTFile = fopen(DLT_FILE_NAME, "w");
+    data[0] = 0;
+    data[1] = 0;
+    data[2] = 0;
+    LookupTable[0] = 0;
+    for(i = 1; i <= 3; i++) {
+      for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
+        tempData.cw = error_mask;
+        j = (GetSyndrome(error_mask) << 12) * 3;
+        data[j] = tempData.bytes[0];
+        data[j+1] = tempData.bytes[1];
+        data[j+2] = tempData.bytes[2];
+        LookupTable[GetSyndrome(error_mask) << 12] = error_mask;
+      }
+    }
+    res = fwrite(data, sizeof(uint8_t) * 3, 2048, LTFile);
+    printf (" Done.\n");
+  }
+
+  return res;
+}

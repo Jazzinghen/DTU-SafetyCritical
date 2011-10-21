@@ -30,13 +30,16 @@ size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
 
   uint8_t data [4096 * 3];
 
+  memset(LookupTable, 0, sizeof(GolayCW) * 4096);
+
   LTFile = fopen(ELT_FILE_NAME, "r");
 
   if (LTFile != NULL) {
-    printf("Now reading Lookup Table: ");
+    printf("Now reading the Encoding Lookup Table: ");
     res = fread(data, sizeof(uint8_t) * 3, 4096, LTFile);
     for (i = 0; i < 4096; i++){
       j = i*3;
+      tempData.cw = 0;
       tempData.bytes[0] = data[j];
       tempData.bytes[1] = data[j+1];
       tempData.bytes[2] = data[j+2];
@@ -50,7 +53,7 @@ size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
     }
     printf (" Done.\n");
   } else {
-    printf("Now generating Lookup Table: ");
+    printf("Now generating the Encoding Lookup Table: ");
     LTFile = fopen(ELT_FILE_NAME, "w");
     for (fakeData = 0; fakeData < 4096; fakeData++) {
       tempData.cw = 0;
@@ -59,6 +62,9 @@ size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
       tempCW.cw.data = fakeData;
       Encode(GOLAY_24, &tempCW);
       LookupTable[fakeData].CodeWord = tempCW.CodeWord;
+      if (GetParity(LookupTable[fakeData].CodeWord)) {
+        printf("MFW!\n");
+      }
       tempData.cw = tempCW.CodeWord;
       data[j] = tempData.bytes[0];
       data[j+1] = tempData.bytes[1];
