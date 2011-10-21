@@ -21,6 +21,7 @@ uint8_t Test(uint32_t x) {
 		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
 			CodeWord1.CodeWord = CodeWord2.CodeWord ^ error_mask;
 			error_status = Correction(GOLAY_23, &CodeWord1);
+
 			if(CodeWord2.CodeWord ^ CodeWord1.CodeWord) {
         		printf ("Something went wrong. Status: %d\n", error_status);
         		PrintBinary(CodeWord2.CodeWord ^ CodeWord1.CodeWord);
@@ -39,10 +40,22 @@ int main(int argc, char** argv) {
 	GolayCW encLookUp[4096];
 
   ComputeELT(GOLAY_24, encLookUp);
-	/*for(i = 0x000; i<=0x0ff; i++) {
+
+	for(i = 0x000; i<=0x0ff; i++) {
+		cw.CodeWord = i;
+		Encode(GOLAY_24, &cw);
+		printf("%d\n", Correction(GOLAY_24, &cw));
+	}
+	getchar();
+
+
+	printf("Enc:%d\n", EncodeFile("aaa.txt", "bbb.txt", GOLAY_24));
+	printf("Dec:%d\n", DecodeFile("bbb.txt", "ccc.txt", GOLAY_24));
+
+	for(i = 0x000; i<=0x0ff; i++) {
 		Test(i);
 	}
-	printf("ok\n");*/
+	printf("ok\n");
 
 	cw.cw.data = 10;
 	PrintBinary(cw.CodeWord);

@@ -1,5 +1,52 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
 #include "headers/utils.h"
 #include "headers/decoder.h"
+
+uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
+	FILE *fp_s = fopen(src, "r");
+	FILE *fp_d = fopen(dst, "w");
+
+	if(!fp_s || !fp_d) {
+		return 1;
+	}
+
+	GolayCW cw1, cw2;
+	uint8_t src_data[6]={0};
+
+	while(fread(src_data, 1, 6, fp_s)) {
+		cw1.CodeWord  = (src_data[0]);
+		cw1.CodeWord |= (src_data[1])<<8;
+		cw1.CodeWord |= (src_data[2])<<16;
+
+		cw2.CodeWord  = (src_data[3]);
+		cw2.CodeWord |= (src_data[4])<<8;
+		cw2.CodeWord |= (src_data[5])<<16;
+
+		PrintBinary(cw1.CodeWord);
+		PrintBinary(cw2.CodeWord);
+
+		printf("%d\n", Correction(mode, &cw1));
+		printf("%d\n", Correction(mode, &cw2));
+
+		//printf("c: %c\n", (cw1.CodeWord>>4) &0xff);
+		//fputc( cw1.CodeWord     &0xff,fp_d);
+		//fputc((cw1.CodeWord>>8) &0xff,fp_d);
+		//fputc((cw1.CodeWord>>16)&0xff,fp_d);
+
+
+		memset(src_data, 0, sizeof(src_data));
+	}
+
+	fclose(fp_s);
+	fclose(fp_d);
+
+	return 0;
+}
+
 
 /*  This is the function used to check whether a Golay Codeword is correct or not.
  *  It can be used to check whether there have been errors and, by definition, can
@@ -128,3 +175,4 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
     return (DECODE_NO_ERRORS);
   }
 } /* correct */
+
