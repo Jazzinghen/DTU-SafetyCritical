@@ -62,17 +62,15 @@ int main(int argc, char** argv) {
 		Test(i);
 		*/
 	for(i = 0x000; i<=0xfff; i++) {
-		cw.CodeWord = 0;
-		cw.cw.data = i;
-		Encode(GOLAY_24, &cw);
-	    if((cw.CodeWord ^ encLookUp[cw.cw.data].CodeWord) != 0){
-	      /*printf("The On-The-Fly Enconding:\n");
-	      PrintBinary(cw.CodeWord);
-	      printf("The LUT Enconding:\n");
-	      PrintBinary(encLookUp[cw.cw.data].CodeWord);
-	      printf("There is THIS difference: \n");*/
-	      PrintBinary(cw.CodeWord ^ encLookUp[cw.cw.data].CodeWord);
-	    }
+		cw.CodeWord = i;
+		cwlt.CodeWord = i;
+		
+		Encode(GOLAY_23, &cw);
+		EncodeLT(GOLAY_23, &cwlt, encLookUp);
+		
+		if(cwlt.CodeWord ^ cw.CodeWord) {
+			puts("err");	
+		}
 	}
 	printf("ok\n");
 getchar();

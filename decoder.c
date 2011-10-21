@@ -49,6 +49,9 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 	return 0;
 }
 
+void DecodeLT (uint8_t mode, GolayCW *CodeWord, GolayCW *LookupTable) {
+	CodeWord->CodeWord = CodeWord->CodeWord ^ LookupTable[GetSyndrome(CodeWord->CodeWord)].CodeWord;	
+}
 
 /*  This is the function used to check whether a Golay Codeword is correct or not.
  *  It can be used to check whether there have been errors and, by definition, can

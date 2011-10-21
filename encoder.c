@@ -14,7 +14,11 @@ void Encode(uint8_t parity_mode, GolayCW *CodeWord) {
 }
 
 void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW *LookupTable) {
-	CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord;
+	if(parity_mode == GOLAY_24) {
+		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord;
+	} else {
+		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord & 0x7fffff;	
+	}
 }
 
 size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
