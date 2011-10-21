@@ -237,7 +237,7 @@ size_t ComputeDLT(uint32_t * LookupTable) {
         data[j] = tempData.bytes[0];
         data[j+1] = tempData.bytes[1];
         data[j+2] = tempData.bytes[2];
-        LookupTable[GetSyndrome(error_mask) << 12] = error_mask;
+        LookupTable[GetSyndrome(error_mask)] = error_mask;
       }
     }
     res = fwrite(data, sizeof(uint8_t) * 4, 2048, LTFile);
