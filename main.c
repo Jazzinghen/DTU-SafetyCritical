@@ -36,17 +36,18 @@ int main(int argc, char** argv) {
 	uint16_t i;
 	GolayCW cw,cwlt;
 	cw.CodeWord = 0;
+	uint32_t tempSyndrome = 0;
 
 	GolayCW encLookUp[4096];
-	
-	memset(encLookUp, 0, sizeof(GolayCW)*4096);
+	uint32_t decLookUp[2048];
 
   	ComputeELT(GOLAY_24, encLookUp);
+  	ComputeDLT(decLookUp);
 
 	/*for(i = 0x000; i<=0x0ff; i++) {
 		cw.CodeWord = i;
 		cwlt.CodeWord = i;
-		
+
 		Encode(GOLAY_24, &cw);
 		EncodeLT(GOLAY_24, &cwlt, encLookUp);
 		PrintBinary(cw.CodeWord^cwlt.CodeWord);
@@ -75,7 +76,7 @@ int main(int argc, char** argv) {
 	    }
 	}
 	printf("ok\n");
-getchar();
+
 	cw.cw.data = 0x555;
 	PrintBinary(cw.CodeWord);
 	Encode(GOLAY_24, &cw);
@@ -83,10 +84,26 @@ getchar();
 	PrintBinary(cw.CodeWord);
 	printf("The LUT Enconding:\n");
 	PrintBinary(encLookUp[cw.cw.data].CodeWord);
-	uint8_t err = 0;
+
+  printf("\nNow Testing Syndrome LUT! :D\n");
+
+  cw.cw.parity=0;
+
+  cwlt.CodeWord = cw.CodeWord;
+
+	cw.cw.data = 0x555^0x2;
 	PrintBinary(cw.CodeWord);
-	cw.cw.data = 0x555^0xf;
-	PrintBinary(cw.CodeWord);
+
+
+	tempSyndrome = GetSyndrome(cw.CodeWord);
+	printf("Ok, this is the computed difference: \n");
+	PrintBinary(cwlt.CodeWord ^ cw.CodeWord);
+
+	printf("While THIS is the one gotten from the LookUpTable:\n");
+	//PrintBinary(tempSyndrome);
+	//printf("The syndrome: %d\n", tempSyndrome);
+	PrintBinary(decLookUp[tempSyndrome]);
+
 	printf ("%d\n After Correction:\n", Correction(GOLAY_24, &cw));
 	PrintBinary(cw.CodeWord);
 
