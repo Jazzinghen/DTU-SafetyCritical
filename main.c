@@ -34,21 +34,23 @@ uint8_t Test(uint32_t x) {
 int main(int argc, char** argv) {
 	uint16_t i;
 	GolayCW cw;
+	cw.CodeWord = 0;
 
-	for(i = 0x000; i<=0x0ff; i++) {
+	GolayCW encLookUp[4096];
+
+  ComputeELT(GOLAY_24, encLookUp);
+	/*for(i = 0x000; i<=0x0ff; i++) {
 		Test(i);
 	}
-	printf("ok\n");
+	printf("ok\n");*/
 
-	cw.CodeWord = 0x555;
-	PrintBinary(cw.CodeWord);
-	getchar();
-
-	cw.CodeWord = 0x555;
+	cw.cw.data = 10;
 	PrintBinary(cw.CodeWord);
 	Encode(GOLAY_24, &cw);
+	printf("The On-The-Fly Enconding:\n");
 	PrintBinary(cw.CodeWord);
-	PrintBinary(cw.cw.check);
+	printf("The LUT Enconding:\n");
+	PrintBinary(encLookUp[cw.cw.data].CodeWord);
 	uint8_t err = 0;
 	PrintBinary(cw.CodeWord);
 	cw.cw.data = 0x555^0xf;
@@ -56,13 +58,13 @@ int main(int argc, char** argv) {
 	printf ("%d\n After Correction:\n", Correction(GOLAY_24, &cw));
 	PrintBinary(cw.CodeWord);
 
-	getchar();
+	//getchar();
 
 	PrintBinary(GneratorPoly);
 	PrintBinary(0x555<<11);
 	PrintBinary(GetSyndrome(0x1));
 
-	getchar();
+	//getchar();
 
 	return (EXIT_SUCCESS);
 }

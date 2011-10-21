@@ -2,16 +2,17 @@
 #define UTILS_H_INCLUDED
 
 #include <stdint.h>
+#include <stdio.h>
 
 #define GneratorPoly                0xAE3 // Another alternative would be to use the codeword 0xC75
 
 //modes
 #define GOLAY_23                    0x00
 #define GOLAY_24                    0x01
-#define LT_ENABLED					0x02
+#define LT_ENABLED					        0x02
 
-#define LT23_FILE_NAME				".LT23.lt"
-#define LT24_FILE_NAME				".LT24.lt"
+#define ELT_FILE_NAME				        ".ELT.lt"
+#define DLT_FILE_NAME				        ".DLT.lt"
 
 #define DECODE_NO_ERRORS            0
 #define DECODE_PARITY_ERRORS        1

@@ -4,11 +4,11 @@
 #include <stdint.h>
 #include "utils.h"
 
-uint32_t Encode (uint8_t parity_mode, GolayCW *CodeWord);
+void Encode (uint8_t parity_mode, GolayCW *CodeWord);
 uint32_t EncodeLT (uint8_t parity_mode, GolayCW *CodeWord);
 
 uint32_t EncodeFile(char *src, char *dst, uint8_t mode);
 
-uint8_t  ComputeELT(uint8_t mode);
+size_t  ComputeELT(uint8_t mode, GolayCW * LookupTable);
 
 #endif // ENCODER_H_INCLUDED
