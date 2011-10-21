@@ -5,7 +5,7 @@
 #include "utils.h"
 
 void Encode (uint8_t parity_mode, GolayCW *CodeWord);
-uint32_t EncodeLT (uint8_t parity_mode, GolayCW *CodeWord);
+void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW * LookupTable);
 
 uint32_t EncodeFile(char *src, char *dst, uint8_t mode);
 

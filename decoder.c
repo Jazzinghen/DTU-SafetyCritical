@@ -26,18 +26,20 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 		cw2.CodeWord |= (src_data[4])<<8;
 		cw2.CodeWord |= (src_data[5])<<16;
 
-		PrintBinary(cw1.CodeWord);
-		PrintBinary(cw2.CodeWord);
+		//PrintBinary(cw1.CodeWord);
+		//PrintBinary(cw2.CodeWord);
 
-		printf("%d\n", Correction(mode, &cw1));
-		printf("%d\n", Correction(mode, &cw2));
+		Correction(mode, &cw1);
+		Correction(mode, &cw2);
+		
+		//printf("%d\n", Correction(mode, &cw1));
+		//printf("%d\n", Correction(mode, &cw2));
 
 		//printf("c: %c\n", (cw1.CodeWord>>4) &0xff);
-		//fputc( cw1.CodeWord     &0xff,fp_d);
-		//fputc((cw1.CodeWord>>8) &0xff,fp_d);
-		//fputc((cw1.CodeWord>>16)&0xff,fp_d);
-
-
+		fputc((cw1.CodeWord>>4)&0xff, fp_d);
+		fputc((cw1.CodeWord<<4)&0xf0 | (cw2.CodeWord>>8)&0x0f, fp_d);
+		fputc((cw2.CodeWord)   &0xff, fp_d);
+		
 		memset(src_data, 0, sizeof(src_data));
 	}
 
