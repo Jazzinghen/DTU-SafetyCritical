@@ -73,8 +73,8 @@ int main(int argc, char** argv) {
 		cw.CodeWord = i;
 		cwlt.CodeWord = i;
 
-		Encode(GOLAY_23, &cw);
-		EncodeLT(GOLAY_23, &cwlt, encLookUp);
+		Encode(GOLAY_24, &cw);
+		EncodeLT(GOLAY_24, &cwlt, encLookUp);
 
 		if(cwlt.CodeWord ^ cw.CodeWord) {
 			puts("err");
