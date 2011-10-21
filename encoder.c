@@ -10,8 +10,11 @@ void Encode(uint8_t parity_mode, GolayCW *CodeWord) {
 	CodeWord->cw.check = GetSyndrome(CodeWord->cw.data)&0x7ff;
 	if (parity_mode == GOLAY_24){
 		CodeWord->cw.parity = GetParity(CodeWord->CodeWord);
-  }
+    }
+}
 
+void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW *LookupTable) {
+	CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord;
 }
 
 size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
@@ -102,8 +105,8 @@ uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
 		Encode(mode, &cw1);
 		Encode(mode, &cw2);
 
-		PrintBinary(cw1.CodeWord);
-		PrintBinary(cw2.CodeWord);
+		//PrintBinary(cw1.CodeWord);
+		//PrintBinary(cw2.CodeWord);
 
 		fputc( cw1.CodeWord     &0xff,fp_d);
 		fputc((cw1.CodeWord>>8) &0xff,fp_d);

@@ -34,36 +34,45 @@ uint8_t Test(uint32_t x) {
 
 int main(int argc, char** argv) {
 	uint16_t i;
-	GolayCW cw;
+	GolayCW cw,cwlt;
 	cw.CodeWord = 0;
 
 	GolayCW encLookUp[4096];
+	
+	memset(encLookUp, 0, sizeof(GolayCW)*4096);
 
-  ComputeELT(GOLAY_24, encLookUp);
+  	ComputeELT(GOLAY_24, encLookUp);
 
 	/*for(i = 0x000; i<=0x0ff; i++) {
 		cw.CodeWord = i;
+		cwlt.CodeWord = i;
+		
 		Encode(GOLAY_24, &cw);
-		printf("%d\n", Correction(GOLAY_24, &cw));
+		EncodeLT(GOLAY_24, &cwlt, encLookUp);
+		PrintBinary(cw.CodeWord^cwlt.CodeWord);
+		//printf("%d\n", Correction(GOLAY_24, &cw));
 	}
-	getchar();
+	//getchar();
 
 
 	printf("Enc:%d\n", EncodeFile("aaa.txt", "bbb.txt", GOLAY_24));
 	printf("Dec:%d\n", DecodeFile("bbb.txt", "ccc.txt", GOLAY_24));
-*/
+	getchar();
+	for(i = 0x000; i<=0x0ff; i++) {
+		Test(i);
+		*/
 	for(i = 0x000; i<=0xfff; i++) {
 		cw.CodeWord = 0;
 		cw.cw.data = i;
 		Encode(GOLAY_24, &cw);
-    if((cw.CodeWord ^ encLookUp[cw.cw.data].CodeWord) != 0){
-      /*printf("The On-The-Fly Enconding:\n");
-      PrintBinary(cw.CodeWord);
-      printf("The LUT Enconding:\n");
-      PrintBinary(encLookUp[cw.cw.data].CodeWord);
-      printf("There is THIS difference: \n");*/
-      PrintBinary(cw.CodeWord ^ encLookUp[cw.cw.data].CodeWord);
-    }
+	    if((cw.CodeWord ^ encLookUp[cw.cw.data].CodeWord) != 0){
+	      /*printf("The On-The-Fly Enconding:\n");
+	      PrintBinary(cw.CodeWord);
+	      printf("The LUT Enconding:\n");
+	      PrintBinary(encLookUp[cw.cw.data].CodeWord);
+	      printf("There is THIS difference: \n");*/
+	      PrintBinary(cw.CodeWord ^ encLookUp[cw.cw.data].CodeWord);
+	    }
 	}
 	printf("ok\n");
 
