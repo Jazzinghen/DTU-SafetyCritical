@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 	    }
 	}
 	printf("ok\n");
-
+getchar();
 	cw.cw.data = 0x555;
 	PrintBinary(cw.CodeWord);
 	Encode(GOLAY_24, &cw);
