@@ -7,7 +7,7 @@
 uint8_t Decode (uint8_t correct_mode, uint8_t *errors, GolayCW *codeWord);
 uint8_t DecodeFile (char *src, char *dst, uint8_t mode);
 
-void DecodeLT (uint8_t mode, GolayCW *CodeWord, GolayCW *LookupTable);	
+void DecodeLT (uint8_t mode, GolayCW *CodeWord, uint32_t *LookupTable);	
 
 uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord);
 
