@@ -64,7 +64,7 @@ uint8_t ErrorCheck (uint8_t parity_mode, GolayCW *codeWord){
   }
 
   //  We check for a reminder in the division of the Codeword by the Generator Polynomial
-  if (GetSyndrome(codeWord->CodeWord) > 0) {
+  if (GetSyndrome(codeWord->CodeWord&0x7fffff) > 0) {
       return(DECODE_SYNDROME_ERRORS); //  Means that there has been at least one error.
   } else {
       return(DECODE_NO_ERRORS);       //  No errors detected.
