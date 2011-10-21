@@ -191,7 +191,6 @@ size_t ComputeDLT(uint32_t * LookupTable) {
   uint32_t error_mask_arr[] = {0x00, 0x01, 0x03, 0x07};
 	uint32_t error_mask;
 
-  uint16_t fakeData = 0;
   uint16_t i = 0;
   uint32_t j = 0;
   FILE *LTFile;
@@ -203,10 +202,9 @@ size_t ComputeDLT(uint32_t * LookupTable) {
   } tempData;
   memset(LookupTable, 0, sizeof(GolayCW) * 2048);
 
-  GolayCW tempCW;
+  uint8_t data [2048 * 4];
 
-  uint8_t data [2048 * 3];
-
+  memset(LookupTable, 0, sizeof(uint32_t) * 2048);
   LTFile = fopen(DLT_FILE_NAME, "r");
 
   if (LTFile != NULL) {
@@ -220,6 +218,7 @@ size_t ComputeDLT(uint32_t * LookupTable) {
       LookupTable[i] = tempData.cw;
       if ((i%128) == 0) {
         printf (".");
+
       }
     }
     printf (" Done.\n");

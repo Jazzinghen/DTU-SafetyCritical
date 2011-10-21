@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 
   cwlt.CodeWord = cw.CodeWord;
 
-	cw.cw.data = 0x555^0x2;
+	cw.cw.data = 0x555^0x1105;
 	PrintBinary(cw.CodeWord);
 
 
@@ -113,14 +113,11 @@ int main(int argc, char** argv) {
 	//printf("The syndrome: %d\n", tempSyndrome);
 	PrintBinary(decLookUp[tempSyndrome]);
 
+  cwlt.CodeWord = cw.CodeWord;
 	printf ("%d\n After Correction:\n", Correction(GOLAY_24, &cw));
 	PrintBinary(cw.CodeWord);
+	PrintBinary(cwlt.CodeWord ^ decLookUp[tempSyndrome]);
 
-	//getchar();
-
-	PrintBinary(GneratorPoly);
-	PrintBinary(0x555<<11);
-	PrintBinary(GetSyndrome(0x1));
 
 	//getchar();
 
