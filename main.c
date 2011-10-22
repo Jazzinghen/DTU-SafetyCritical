@@ -5,14 +5,11 @@
 #include "headers/encoder.h"
 #include "headers/decoder.h"
 
-uint8_t Test(uint32_t x) {
+uint8_t Test(uint32_t x, uint32_t * LookUpTable) {
 	uint8_t i;
 	uint32_t error_mask_arr[] = {0x00, 0x01,0x03,0x07, 0x0f};
 	uint32_t error_mask;
 	uint8_t error_status;
-	
-	uint32_t decLookUp[2048];
-  	ComputeDLT(decLookUp);
 
 	GolayCW CodeWord1, CodeWord2;
 	CodeWord1.CodeWord = x;
@@ -23,9 +20,9 @@ uint8_t Test(uint32_t x) {
 	for(i = 1; i <= 3; i++) {
 		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
 			CodeWord1.CodeWord = CodeWord2.CodeWord ^ error_mask;
-			
-			 DecodeLT (GOLAY_24, &CodeWord1, decLookUp);	
-			
+
+			 DecodeLT (GOLAY_24, &CodeWord1, LookUpTable);
+
 			//error_status = Correction(GOLAY_23, &CodeWord1);
 
 			if(CodeWord2.CodeWord ^ CodeWord1.CodeWord) {
@@ -47,14 +44,12 @@ int main(int argc, char** argv) {
 	GolayCW encLookUp[4096];
 	uint32_t decLookUp[2048];
 
-  	ComputeELT(GOLAY_24, encLookUp);
-  	ComputeDLT(decLookUp);
+  ComputeELT(GOLAY_24, encLookUp);
+  ComputeDLT(decLookUp);
 
-	for(i = 0x000; i<=0x0ff; i++) {
-		Test(i);
-		printf("ok\n");
+	for(i = 0x000; i<=0xf; i++) {
+		Test(i, decLookUp);
 	}
-	getchar();
 
 	/*for(i = 0x000; i<=0x0ff; i++) {
 		cw.CodeWord = i;
@@ -77,12 +72,12 @@ int main(int argc, char** argv) {
 	for(i = 0x000; i<=0xfff; i++) {
 		cw.CodeWord = i;
 		cwlt.CodeWord = i;
-		
-		Encode(GOLAY_23, &cw);
-		EncodeLT(GOLAY_23, &cwlt, encLookUp);
-		
+
+		Encode(GOLAY_24, &cw);
+		EncodeLT(GOLAY_24, &cwlt, encLookUp);
+
 		if(cwlt.CodeWord ^ cw.CodeWord) {
-			puts("err");	
+			puts("err");
 		}
 	}
 	printf("ok\n");
