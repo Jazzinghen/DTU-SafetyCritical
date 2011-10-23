@@ -5,5 +5,28 @@ implemented both the standard version and the LookUp Table based version.
 
 I'll put here the data I've gotten from the benchmarks.
 
-Average time to compute and write on disk the two LookupTables:
+Average time to compute and write on disk the two Lookup Tables, computed on 10k
+consecutive generations and writings:
   
+  1283458.546 ns
+  
+Time needed to generate a single Lookup Table entry:
+  
+  1283458.546 ns / (4096 + 2048) =
+  
+  208.896     ns
+
+Average time to read the two Lookup Tables from files, computed on 10k
+consecutive readings:
+  
+  86832.1155  ns
+  
+Average time per codeword using Lookup Tables, computed using 10 * 4096 * 2048
+consecutive words with errors (1~3 bits):
+
+  135.72      ns
+  
+Average time per codeword using On-The-Fly correction, computed using
+10 * 4096 * 2048 consecutive words with errors (1~3 bits):
+
+  8711.27     ns

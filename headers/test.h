@@ -6,6 +6,7 @@
 #include "utils.h"
 
 #define TEST_QUANTITY       10
+#define LOOKUP_QUANTITY     1
 #define TEST_TARGET         0xFFF
 #define SEC_PER_NSEC        1000000000
 
@@ -15,6 +16,8 @@
 #define LOAD_OR_REMOVE      0
 #define ALWAYES_REMOVE      1
 
+#define MESSAGES_OFF        0
+#define MESSAGES_ON         1
 
 
 uint8_t TestRun (uint32_t data, uint8_t mode, GolayCW * encodeLookupTable, uint32_t * decodeLookUpTable);

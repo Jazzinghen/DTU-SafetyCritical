@@ -10,6 +10,6 @@ void DecodeLT (uint8_t mode, GolayCW *CodeWord, uint32_t *LookupTable);
 
 uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord);
 
-size_t ComputeDLT (uint32_t * LookupTable);
+size_t ComputeDLT (uint8_t message, uint32_t * LookupTable);
 
 #endif // DECODER_H_INCLUDED

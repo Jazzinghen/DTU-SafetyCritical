@@ -5,6 +5,7 @@
 
 #include "headers/utils.h"
 #include "headers/encoder.h"
+#include "headers/test.h"
 
 /*!\brief	This function calculate Golay CodeWord from 12 bits of data
  *		    stored in a GolayCW structure
@@ -50,7 +51,7 @@ void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW *LookupTable) {
  *  any suspicion that the file is wrong/corrupted simply eliminate it and the function will generate a new
  *  one.
  */
-size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
+size_t ComputeELT(uint8_t messages, uint8_t mode, GolayCW * LookupTable) {
   uint16_t fakeData = 0;
   uint16_t i = 0;
   uint16_t j = 0;
@@ -71,7 +72,9 @@ size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
   LTFile = fopen(ELT_FILE_NAME, "rb");
 
   if (LTFile != NULL) {
-    printf("Now reading the Encoding Lookup Table: ");
+    if (messages == MESSAGES_ON) {
+      ("Now reading the Encoding Lookup Table: ");
+    };
     res = fread(data, sizeof(uint8_t) * 3, 4096, LTFile);
     for (i = 0; i < 4096; i++){
       j = i*3;
@@ -83,13 +86,14 @@ size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
       if (mode == GOLAY_23) {
         LookupTable[i].cw.parity = 0;
       }
-      if ((i%256) == 0) {
+      if ((i%256) == 0 && messages == MESSAGES_ON) {
         printf (".");
       }
     }
-    printf (" Done.\n");
   } else {
-    printf("Now generating the Encoding Lookup Table: ");
+    if (messages == MESSAGES_ON) {
+      printf("Now generating the Encoding Lookup Table: ");
+    }
     LTFile = fopen(ELT_FILE_NAME, "wb");
     for (fakeData = 0; fakeData < 4096; fakeData++) {
       tempData.cw = 0;
@@ -104,11 +108,13 @@ size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
       data[j+1] = tempData.bytes[1];
       data[j+2] = tempData.bytes[2];
 
-      if ((fakeData%256) == 0) {
+      if ((fakeData%256) == 0 && messages == MESSAGES_ON) {
         printf (".");
       }
     }
     res = fwrite(data, sizeof(uint8_t) * 3, 4096, LTFile);
+  }
+  if (messages == MESSAGES_ON) {
     printf (" Done.\n");
   }
 	fclose(LTFile);

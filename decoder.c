@@ -5,6 +5,7 @@
 
 #include "headers/utils.h"
 #include "headers/decoder.h"
+#include "headers/test.h"
 
 /*!\brief	This is the function used to decode files
  *
@@ -36,7 +37,7 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 
 		Correction(mode, &cw1);
 		Correction(mode, &cw2);
-		
+
 		fputc((cw1.CodeWord>>4)&0xff, fp_d);
 		fputc((cw1.CodeWord<<4)&0xf0 | (cw2.CodeWord>>8)&0x0f, fp_d);
 		fputc((cw2.CodeWord)   &0xff, fp_d);
@@ -212,7 +213,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
  *  one.
  */
 
-size_t ComputeDLT(uint32_t * LookupTable) {
+size_t ComputeDLT(uint8_t messages, uint32_t * LookupTable) {
 
   uint32_t error_mask_arr[] = {0x00, 0x01, 0x03, 0x07}; //  Initial values for the error masks (1, 2 or 3 bits errors)
 	uint32_t error_mask;                                  //  Current Error Mask
@@ -240,7 +241,9 @@ size_t ComputeDLT(uint32_t * LookupTable) {
 
   //  If we found it we can read its contents.
   if (LTFile != NULL) {
-    printf("Now reading Decoding Lookup Table: ");
+    if (messages == MESSAGES_ON) {
+      printf("Now reading Decoding Lookup Table: ");
+    }
     //  All the data of the file will be put in the temporary array.
     res = fread(data, sizeof(uint32_t), 2048, LTFile);
     //  Now we'll store all of the data in the Lookup Table, by using the union to concatenate the bytes.
@@ -251,15 +254,16 @@ size_t ComputeDLT(uint32_t * LookupTable) {
       tempData.bytes[2] = data[j+2];
       tempData.bytes[3] = data[j+3];
       LookupTable[i] = tempData.cw;
-      if ((i%128) == 0) {
+      if ((i%128) == 0 && messages == MESSAGES_ON) {
         printf (".");
-
       }
     }
-    printf (" Done.\n");
+
   } else {
     //  In here we will generate the data AND write it into the file.
-    printf("Now generating Decoding Lookup Table: ");
+    if (messages == MESSAGES_ON) {
+      printf("Now generating Decoding Lookup Table: ");
+    }
     LTFile = fopen(DLT_FILE_NAME, "wb");
     //  To avoid infinite loops (Read Below) we set the error pattern for syndrome 0 as 0. It means that,
     //  if the syndrome is zero then the codeword is correct.
@@ -285,9 +289,12 @@ size_t ComputeDLT(uint32_t * LookupTable) {
     }
     //  Eventually we will write the array back into the Lookup Table File.
     res = fwrite(data, sizeof(uint32_t), 2048, LTFile);
+  }
+  if (messages == MESSAGES_ON) {
     printf (" Done.\n");
   }
 
+  fclose(LTFile);
   //  We return the result of our writing/reading operations. Should be always 2048.
   return res;
 }
