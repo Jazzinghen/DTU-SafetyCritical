@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 #include "headers/utils.h"
 #include "headers/encoder.h"
@@ -23,9 +22,7 @@ uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTab
 			CodeWord1.CodeWord = CodeWord2.CodeWord ^ error_mask;
 
       DecodeLT (GOLAY_24, &CodeWord1, DecodeLookUpTable);
-
 			//error_status = Correction(GOLAY_23, &CodeWord1);
-
 			if(CodeWord2.CodeWord ^ CodeWord1.CodeWord) {
         		printf ("Mask: %x Something went wrong. Status: %d\n", error_mask, error_status);
         		PrintBinary(CodeWord2.CodeWord ^ CodeWord1.CodeWord);
@@ -37,6 +34,10 @@ uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTab
 }
 
 int main(int argc, char** argv) {
+#ifdef __unix__
+	printf("aaaaaaaaaaaa\n");
+#endif
+
 	uint16_t i;
 	GolayCW cw,cwlt;
 	cw.CodeWord = 0;
@@ -64,6 +65,7 @@ int main(int argc, char** argv) {
 
 	printf("Tests completed. Time elapsed: ");
 
+	getchar();
 	/*for(i = 0x000; i<=0x0ff; i++) {
 		cw.CodeWord = i;
 		cwlt.CodeWord = i;

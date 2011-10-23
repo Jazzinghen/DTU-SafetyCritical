@@ -13,6 +13,15 @@ void PrintBinary(uint32_t CodeWord) {
 	puts("");
 }
 
+//Compute the lexicographically next bit permutation
+//from: Bit Twiddling Hacks
+//http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation
+//ret: next permutation of bits
+uint32_t NextBitPermutation(uint32_t word) {
+	uint32_t t = (word | (word - 1)) + 1;
+	return t | ((((t & -t) / (word & -word)) >> 1) - 1);
+}
+
 //Counting 1-bits, "divide and conquer" strategy.
 //from boook: Hackers delight p. 95;
 int32_t Weight(uint32_t CodeWord) {
@@ -56,15 +65,7 @@ uint32_t RotR(uint32_t CodeWord, int32_t i) {
 	return (CodeWord & 0x7fffff);
 }
 
-//Compute the lexicographically next bit permutation
-//from: Bit Twiddling Hacks
-//http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation
-//ret: next permutation of bits
-uint32_t NextBitPermutation(uint32_t word) {
-	uint32_t t = (word | (word - 1)) + 1;
-	return t | ((((t & -t) / (word & -word)) >> 1) - 1);
-}
-
+#ifdef __unix__
 struct timespec ClockDifference (struct timespec begin, struct timespec end) {
   struct timespec difference;
 
@@ -78,3 +79,4 @@ struct timespec ClockDifference (struct timespec begin, struct timespec end) {
 
 	return difference;
 }
+#endif
