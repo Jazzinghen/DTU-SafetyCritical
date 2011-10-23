@@ -6,6 +6,13 @@
 #include "headers/utils.h"
 #include "headers/encoder.h"
 
+/*!\brief	This function calculate Golay CodeWord from 12 bits of data
+ *		    stored in a GolayCW structure
+ *
+ * \param	Parity mode: GOLAY_24 or GOLAY_23
+ * \param	Pointer to a codeword
+ *
+ */
 void Encode(uint8_t parity_mode, GolayCW *CodeWord) {
 	CodeWord->cw.check = GetSyndrome(CodeWord->cw.data)&0x7ff;
 	if (parity_mode == GOLAY_24){
@@ -13,6 +20,14 @@ void Encode(uint8_t parity_mode, GolayCW *CodeWord) {
     }
 }
 
+/*!\brief	This function encode 12 bits of data stored in a GolayCW structure
+ *		    by using lookup tables
+ *
+ * \param	Parity mode: GOLAY_24 or GOLAY_23
+ * \param	Pointer to a codeword
+ * \param   Pointer to a encoding lookup table
+ *
+ */
 void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW *LookupTable) {
 	if(parity_mode == GOLAY_24) {
 		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord;
@@ -100,9 +115,17 @@ size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
   return res;
 }
 
+/*!\brief	This is the function used to encode files
+ *
+ * \param	src:	path to the source file
+ * \param	dst:	path to the destination file
+ * \param   mode: 	GOLAY_24 or GOLAY_23
+ *
+ * \retval	zero if file encoding was successful.
+ */
 uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
-	FILE *fp_s = fopen(src, "rb");
-	FILE *fp_d = fopen(dst, "wb");
+	FILE *fp_s = fopen(src, "r");
+	FILE *fp_d = fopen(dst, "w");
 
 	if(!fp_s || !fp_d) {
 		return 1;
@@ -120,9 +143,6 @@ uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
 
 		Encode(mode, &cw1);
 		Encode(mode, &cw2);
-
-		//PrintBinary(cw1.CodeWord);
-		//PrintBinary(cw2.CodeWord);
 
 		fputc( cw1.CodeWord     &0xff,fp_d);
 		fputc((cw1.CodeWord>>8) &0xff,fp_d);

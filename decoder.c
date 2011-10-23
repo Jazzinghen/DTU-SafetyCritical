@@ -6,6 +6,14 @@
 #include "headers/utils.h"
 #include "headers/decoder.h"
 
+/*!\brief	This is the function used to decode files
+ *
+ * \param	src:	path to the source file
+ * \param	dst:	path to the destination file
+ * \param   mode: 	GOLAY_24 or GOLAY_23
+ *
+ * \retval	zero if file decoding was successful.
+ */
 uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 	FILE *fp_s = fopen(src, "rb");
 	FILE *fp_d = fopen(dst, "wb");
@@ -42,6 +50,13 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 	return 0;
 }
 
+/*!\brief	This function decode Golay CodeWords by using lookup tables
+ *
+ * \param	Parity mode: GOLAY_24 or GOLAY_23
+ * \param	Pointer to a codeword
+ * \param   Pointer to a decoding lookup table
+ *
+ */
 void DecodeLT (uint8_t mode, GolayCW *CodeWord, uint32_t *LookupTable) {
 	CodeWord->CodeWord = CodeWord->CodeWord ^ LookupTable[GetSyndrome(CodeWord->CodeWord&0x7fffff)];
 }

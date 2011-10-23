@@ -2,6 +2,12 @@
 
 #include "headers/utils.h"
 
+/*!\brief	This is the function used to print 
+ * 			CodeWord in binary representation
+ *
+ * \param	CodeWord:	 value to print
+ * 
+ */
 void PrintBinary(uint32_t CodeWord) {
 	int32_t i;
 	for(i = 31; i >= 0; i--) {
@@ -13,17 +19,28 @@ void PrintBinary(uint32_t CodeWord) {
 	puts("");
 }
 
-//Compute the lexicographically next bit permutation
-//from: Bit Twiddling Hacks
-//http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation
-//ret: next permutation of bits
+/*!\brief	This is the function used to compute 
+ *			the lexicographically next bit permutation
+ *
+ * \param	word:	previous permutation of bits
+ * 
+ * \retval			next permutation of bits
+ * \note	FROM:	Bit Twiddling Hacks
+ * 			URL:	http://www-graphics.stanford.edu/~seander/bithacks.html
+ */
 uint32_t NextBitPermutation(uint32_t word) {
 	uint32_t t = (word | (word - 1)) + 1;
 	return t | ((((t & -t) / (word & -word)) >> 1) - 1);
 }
 
-//Counting 1-bits, "divide and conquer" strategy.
-//from boook: Hackers delight p. 95;
+/*!\brief	This is the function used to count 1-bits in a word
+ *			by "devide and conquer" strategy.
+ *
+ * \param	CodeWord: a word
+ * 
+ * \retval			number of 1-bits
+ * \note	FROM:	Hackers delight p. 95;
+ */
 int32_t Weight(uint32_t CodeWord) {
 	CodeWord = CodeWord - ((CodeWord >> 1) & 0x55555555);
 	CodeWord = (CodeWord & 0x33333333) + ((CodeWord >> 2) & 0x33333333);
@@ -34,8 +51,14 @@ int32_t Weight(uint32_t CodeWord) {
 	return CodeWord & 0x0000003F;
 }
 
-//Computing the Parity of a Word
-//from boook: Hackers delight p. 105;
+/*!\brief	This is the function used to compute the parity of a word
+ *			by "devide and conquer" strategy.
+ *
+ * \param	CodeWord: a word
+ * 
+ * \retval			parity bit
+ * \note	FROM:	Hackers delight p. 105;
+ */
 int32_t GetParity(uint32_t CodeWord) {
 	CodeWord = CodeWord ^ (CodeWord >> 1);
 	CodeWord = (CodeWord ^ (CodeWord >> 2)) & 0x11111111;
@@ -53,12 +76,26 @@ uint32_t GetSyndrome(uint32_t CodeWord) {
 	return(CodeWord);
 }
 
+/*!\brief	This is the function used to rotate with carry 
+ *          23 bit long word by n bits to the left
+ *			
+ * \param	CodeWord: a word to rotate
+ * \param	i:		  times of rotation
+ * \retval			  result of rotation
+ */
 uint32_t RotL(uint32_t CodeWord, int32_t i) {
 	i%=23;
 	CodeWord = (CodeWord << i) | (CodeWord >> 23-i);
 	return (CodeWord & 0x7fffff);
 }
 
+/*!\brief	This is the function used to rotate with carry 
+ *          23 bit long word by n bits to the right
+ *			
+ * \param	CodeWord: a word to rotate
+ * \param	i:		  times of rotation
+ * \retval			  result of rotation
+ */
 uint32_t RotR(uint32_t CodeWord, int32_t i) {
 	i%=23;
 	CodeWord = (CodeWord >> i) | (CodeWord << (23-i));
