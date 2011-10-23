@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "headers/utils.h"
 #include "headers/encoder.h"
@@ -20,11 +21,8 @@ uint8_t Test(uint32_t x, uint32_t * LookUpTable) {
 	for(i = 1; i <= 3; i++) {
 		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
 			CodeWord1.CodeWord = CodeWord2.CodeWord ^ error_mask;
-
-			 DecodeLT (GOLAY_24, &CodeWord1, LookUpTable);
-
+			DecodeLT (GOLAY_24, &CodeWord1, LookUpTable);
 			//error_status = Correction(GOLAY_23, &CodeWord1);
-
 			if(CodeWord2.CodeWord ^ CodeWord1.CodeWord) {
         		printf ("Mask: %x Something went wrong. Status: %d\n", error_mask, error_status);
         		PrintBinary(CodeWord2.CodeWord ^ CodeWord1.CodeWord);
@@ -34,6 +32,11 @@ uint8_t Test(uint32_t x, uint32_t * LookUpTable) {
 	}
 	return ALGORITHM_IS_CORRECT;
 }
+
+struct timespec {
+	time_t tv_sec; /* seconds */
+	long tv_nsec; /* nanoseconds */
+};
 
 int main(int argc, char** argv) {
 	uint16_t i;
@@ -50,7 +53,7 @@ int main(int argc, char** argv) {
 	for(i = 0x000; i<=0xf; i++) {
 		Test(i, decLookUp);
 	}
-
+	getchar();
 	/*for(i = 0x000; i<=0x0ff; i++) {
 		cw.CodeWord = i;
 		cwlt.CodeWord = i;
