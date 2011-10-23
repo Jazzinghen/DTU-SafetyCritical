@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <time.h>
 
 #define GneratorPoly                0xAE3 // Another alternative would be to use the codeword 0xC75
 
@@ -31,7 +32,7 @@ typedef union {
   } cw;
 } GolayCW;
 
-void PrintBinary(uint32_t CodeWord);
+void PrintBinary (uint32_t CodeWord);
 
 int32_t Weight (uint32_t CodeWord);
 int32_t GetParity (uint32_t CodeWord);
@@ -41,5 +42,7 @@ uint32_t RotL (uint32_t CodeWord, int32_t i);
 uint32_t RotR (uint32_t CodeWord, int32_t i);
 
 uint32_t NextBitPermutation(uint32_t word);
+
+struct timespec ClockDifference (struct timespec begin, struct timespec end);
 
 #endif // UTILS_H_INCLUDED

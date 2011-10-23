@@ -17,10 +17,24 @@ void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW *LookupTable) {
 	if(parity_mode == GOLAY_24) {
 		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord;
 	} else {
-		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord & 0x7fffff;	
+		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord & 0x7fffff;
 	}
 }
 
+/*  This is the function used to compute the Lookup Table for the encoding.
+ *
+ *  The idea is pretty simple: we just compute the codeword associated to every single 12Bits combination
+ *  and then store it using the data as index. When we want to encode a chunk of data we just have to look
+ *  for the entire codeword in the Lookup Table.
+ *
+ *  This function checks also if there is already a Lookup Table File. If this is the case it loads
+ *  the Lookup Table in the array. On the other hand, if the file does not exist, then the Lookup Table
+ *  is computed and stored both in an external file and in the array.
+ *
+ *  Bear in mind that it doesn't check whether the file has a correct Lookup Table or not, so if there's
+ *  any suspicion that the file is wrong/corrupted simply eliminate it and the function will generate a new
+ *  one.
+ */
 size_t ComputeELT(uint8_t mode, GolayCW * LookupTable) {
   uint16_t fakeData = 0;
   uint16_t i = 0;
