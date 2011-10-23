@@ -14,6 +14,10 @@ int main(int argc, char** argv) {
   double totalAverage = 0;
 
 
+	printf("Enc:%d\n", EncodeFile("aaa.txt", "bbb.txt", GOLAY_24));
+	printf("Number of errors injected: %d\n", InjectErrorsFile("bbb.txt", 0));
+	printf("Dec:%d\n", DecodeFile("bbb.txt", "ccc.txt", GOLAY_24));
+
 #ifdef __unix__
   struct timespec startTime, endTime, timeElapsed;
   double average;
@@ -56,7 +60,7 @@ int main(int argc, char** argv) {
 
 	for(i = 0x000; i <= TEST_TARGET; i++) {
 	  //printf("Testing codeword %X: ", i);
-		TestRun(i, LOOKUP_TEST, encLookUp, decLookUp);
+		TestRun(i, ONTHEFLY_TEST, encLookUp, decLookUp);
 		//printf(" Done.\n");
 	}
 
@@ -73,7 +77,7 @@ int main(int argc, char** argv) {
 #endif
   }
 
-  printf("Average time per word over %i runs:\n%f nanoseconds per word.\n", TEST_QUANTITY, totalAverage/TEST_QUANTITY);
+  printf("Average time per word over %i runs:\n%f nanoseconds per word.\n", TEST_QUANTITY, totalAverage/(TEST_QUANTITY * 2048));
 
 	return (EXIT_SUCCESS);
 }

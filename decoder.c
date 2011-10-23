@@ -27,16 +27,9 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 		cw2.CodeWord |= (src_data[4])<<8;
 		cw2.CodeWord |= (src_data[5])<<16;
 
-		//PrintBinary(cw1.CodeWord);
-		//PrintBinary(cw2.CodeWord);
-
 		Correction(mode, &cw1);
 		Correction(mode, &cw2);
 
-		//printf("%d\n", Correction(mode, &cw1));
-		//printf("%d\n", Correction(mode, &cw2));
-
-		//printf("c: %c\n", (cw1.CodeWord>>4) &0xff);
 		fputc((cw1.CodeWord>>4)&0xff, fp_d);
 		fputc((cw1.CodeWord<<4)&0xf0 | (cw2.CodeWord>>8)&0x0f, fp_d);
 		fputc((cw2.CodeWord)   &0xff, fp_d);
@@ -248,7 +241,6 @@ size_t ComputeDLT(uint8_t messages, uint32_t * LookupTable) {
       LookupTable[i] = tempData.cw;
       if ((i%128) == 0 && messages == MESSAGES_ON) {
         printf (".");
-
       }
     }
 

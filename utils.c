@@ -64,3 +64,27 @@ uint32_t RotR(uint32_t CodeWord, int32_t i) {
 	CodeWord = (CodeWord >> i) | (CodeWord << (23-i));
 	return (CodeWord & 0x7fffff);
 }
+
+int32_t InjectErrorsFile (char *src, uint8_t mode) {
+	FILE *fp_s = fopen(src, "rb+");
+	int32_t ret = 0;
+
+	if(!fp_s || mode > 3) {
+		return -1;
+	}
+	
+	uint8_t err_mask[4] = {0x10, 0x01, 0x88, 0x11};
+	uint8_t error_mask; 
+	uint8_t src_data;
+	while(fread(&src_data, 1, 1, fp_s)) {
+		fseek ( fp_s , -1 , SEEK_CUR );
+		error_mask = err_mask[mode]<<(rand()%8);
+		fputc(src_data ^ error_mask, fp_s);
+		ret+=Weight(error_mask);
+		fseek ( fp_s ,  0 , SEEK_CUR );
+		memset(&src_data, 0, sizeof(src_data));
+	}
+	
+	fclose(fp_s);
+	return ret;
+}
