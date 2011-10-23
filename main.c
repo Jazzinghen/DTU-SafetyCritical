@@ -7,6 +7,7 @@
 
 uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTable) {
 	uint8_t i;
+	uint32_t test_no = 0;
 	uint32_t error_mask_arr[] = {0x00, 0x01,0x03,0x07, 0x0f};
 	uint32_t error_mask;
 	uint8_t error_status;
@@ -14,13 +15,20 @@ uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTab
 	GolayCW CodeWord1, CodeWord2;
 	CodeWord1.CodeWord = x;
 	CodeWord2.CodeWord = x;
-	EncodeLT (GOLAY_24, &CodeWord1, EncodeLookupTable);
+	//EncodeLT (GOLAY_24, &CodeWord1, EncodeLookupTable);
+	Encode(GOLAY_24, &CodeWord1);
 	CodeWord2.CodeWord = CodeWord1.CodeWord;
 
 	for(i = 1; i <= 3; i++) {
 		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
+			test_no++;
+
 			CodeWord1.CodeWord = CodeWord2.CodeWord ^ error_mask;
 
+      /*Correction (GOLAY_24, &CodeWord1);
+      if ((test_no%128) == 0) {
+        printf(".");
+      }*/
       DecodeLT (GOLAY_24, &CodeWord1, DecodeLookUpTable);
 			//error_status = Correction(GOLAY_23, &CodeWord1);
 			if(CodeWord2.CodeWord ^ CodeWord1.CodeWord) {
@@ -34,37 +42,44 @@ uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTab
 }
 
 int main(int argc, char** argv) {
-#ifdef __unix__
-	printf("aaaaaaaaaaaa\n");
-#endif
 
 	uint16_t i;
 	GolayCW cw,cwlt;
 	cw.CodeWord = 0;
 	uint32_t tempSyndrome = 0;
+
 #ifdef __unix__
   struct timespec startTime, endTime, timeElapsed;
 #endif
+
 	GolayCW encLookUp[4096];
 	uint32_t decLookUp[2048];
 
   ComputeELT(GOLAY_24, encLookUp);
   ComputeDLT(decLookUp);
+  getchar();
+
 #ifdef __unix__
   printf("Beginning tests. Encoding data from 0x0 to 0xfff and then injecting all the possible errors.\n");
 
   clock_gettime(CLOCK_REALTIME, &startTime);
 #endif
+
+
 	for(i = 0x000; i<=0xfff; i++) {
-		//Test(i, encLookUp, decLookUp);
+	  printf("Testing codeword %X: ", i);
+		Test(i, encLookUp, decLookUp);
+		printf(" Done.\n");
 	}
+
+
 #ifdef __unix__
 	clock_gettime(CLOCK_REALTIME, &endTime);
 
   timeElapsed = ClockDifference(startTime, endTime);
-
-	printf("Tests completed. Time elapsed: ");
+	printf("Tests completed. Time elapsed:\n\t%d seconds\n\t%ld nanoseconds.\n", (int32_t)timeElapsed.tv_sec, timeElapsed.tv_nsec);
 #endif
+
 	getchar();
 	/*for(i = 0x000; i<=0x0ff; i++) {
 		cw.CodeWord = i;
