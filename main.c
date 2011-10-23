@@ -42,29 +42,29 @@ int main(int argc, char** argv) {
 	GolayCW cw,cwlt;
 	cw.CodeWord = 0;
 	uint32_t tempSyndrome = 0;
-
+#ifdef __unix__
   struct timespec startTime, endTime, timeElapsed;
-
+#endif
 	GolayCW encLookUp[4096];
 	uint32_t decLookUp[2048];
 
   ComputeELT(GOLAY_24, encLookUp);
   ComputeDLT(decLookUp);
-
+#ifdef __unix__
   printf("Beginning tests. Encoding data from 0x0 to 0xfff and then injecting all the possible errors.\n");
 
   clock_gettime(CLOCK_REALTIME, &startTime);
-
+#endif
 	for(i = 0x000; i<=0xfff; i++) {
-		Test(i, encLookUp, decLookUp);
+		//Test(i, encLookUp, decLookUp);
 	}
-
+#ifdef __unix__
 	clock_gettime(CLOCK_REALTIME, &endTime);
 
   timeElapsed = ClockDifference(startTime, endTime);
 
 	printf("Tests completed. Time elapsed: ");
-
+#endif
 	getchar();
 	/*for(i = 0x000; i<=0x0ff; i++) {
 		cw.CodeWord = i;

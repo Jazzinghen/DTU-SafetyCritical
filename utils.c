@@ -80,3 +80,31 @@ struct timespec ClockDifference (struct timespec begin, struct timespec end) {
 	return difference;
 }
 #endif
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+#include "headers/utils.h"
+#include "headers/decoder.h"
+
+uint8_t InjectErrorsFile (char *src) {
+	FILE *fp_s = fopen(src, "r+");
+
+	if(!fp_s) {
+		return 1;
+	}
+	
+	uint8_t src_data;
+	while(fread(&src_data, 1, 1, fp_s)) {
+		fseek ( fp_s , -1 , SEEK_CUR );
+		fputc(src_data, fp_s);
+		memset(src_data, 0, sizeof(src_data));
+	}
+	fclose(fp_s);
+	return 0;
+}
+
+
