@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "headers/utils.h"
 #include "headers/encoder.h"
 #include "headers/decoder.h"
 
-uint8_t Test(uint32_t x, uint32_t * LookUpTable) {
+uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTable) {
 	uint8_t i;
 	uint32_t error_mask_arr[] = {0x00, 0x01,0x03,0x07, 0x0f};
 	uint32_t error_mask;
@@ -14,14 +15,14 @@ uint8_t Test(uint32_t x, uint32_t * LookUpTable) {
 	GolayCW CodeWord1, CodeWord2;
 	CodeWord1.CodeWord = x;
 	CodeWord2.CodeWord = x;
-	Encode(GOLAY_24, &CodeWord1);
-	Encode(GOLAY_24, &CodeWord2);
+	EncodeLT (GOLAY_24, &CodeWord1, EncodeLookupTable);
+	CodeWord2.CodeWord = CodeWord1.CodeWord;
 
 	for(i = 1; i <= 3; i++) {
 		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
 			CodeWord1.CodeWord = CodeWord2.CodeWord ^ error_mask;
 
-			 DecodeLT (GOLAY_24, &CodeWord1, LookUpTable);
+      DecodeLT (GOLAY_24, &CodeWord1, DecodeLookUpTable);
 
 			//error_status = Correction(GOLAY_23, &CodeWord1);
 
@@ -41,15 +42,27 @@ int main(int argc, char** argv) {
 	cw.CodeWord = 0;
 	uint32_t tempSyndrome = 0;
 
+  struct timespec startTime, endTime, timeElapsed;
+
 	GolayCW encLookUp[4096];
 	uint32_t decLookUp[2048];
 
   ComputeELT(GOLAY_24, encLookUp);
   ComputeDLT(decLookUp);
 
-	for(i = 0x000; i<=0xf; i++) {
-		Test(i, decLookUp);
+  printf("Beginning tests. Encoding data from 0x0 to 0xfff and then injecting all the possible errors.\n");
+
+  clock_gettime(CLOCK_REALTIME, &startTime);
+
+	for(i = 0x000; i<=0xfff; i++) {
+		Test(i, encLookUp, decLookUp);
 	}
+
+	clock_gettime(CLOCK_REALTIME, &endTime);
+
+  timeElapsed = ClockDifference(startTime, endTime);
+
+	printf("Tests completed. Time elapsed: ");
 
 	/*for(i = 0x000; i<=0x0ff; i++) {
 		cw.CodeWord = i;
@@ -69,7 +82,7 @@ int main(int argc, char** argv) {
 	for(i = 0x000; i<=0x0ff; i++) {
 		Test(i);
 		*/
-	for(i = 0x000; i<=0xfff; i++) {
+	/*for(i = 0x000; i<=0xfff; i++) {
 		cw.CodeWord = i;
 		cwlt.CodeWord = i;
 
@@ -80,7 +93,7 @@ int main(int argc, char** argv) {
 			puts("err");
 		}
 	}
-	printf("ok\n");
+	printf("ok\n");*/
 
 	cw.cw.data = 0x555;
 	PrintBinary(cw.CodeWord);

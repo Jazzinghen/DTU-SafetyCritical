@@ -65,7 +65,6 @@ uint32_t NextBitPermutation(uint32_t word) {
 	return t | ((((t & -t) / (word & -word)) >> 1) - 1);
 }
 
-
 struct timespec ClockDifference (struct timespec begin, struct timespec end) {
   struct timespec difference;
 
