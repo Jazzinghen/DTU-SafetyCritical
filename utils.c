@@ -65,6 +65,7 @@ uint32_t RotR(uint32_t CodeWord, int32_t i) {
 	return (CodeWord & 0x7fffff);
 }
 
+#ifdef __unix__
 struct timespec ClockDifference (struct timespec begin, struct timespec end) {
   struct timespec difference;
 
@@ -78,3 +79,4 @@ struct timespec ClockDifference (struct timespec begin, struct timespec end) {
 
 	return difference;
 }
+#endif

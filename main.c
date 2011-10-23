@@ -33,12 +33,11 @@ uint8_t Test(uint32_t x, uint32_t * LookUpTable) {
 	return ALGORITHM_IS_CORRECT;
 }
 
-struct timespec {
-	time_t tv_sec; /* seconds */
-	long tv_nsec; /* nanoseconds */
-};
-
 int main(int argc, char** argv) {
+#ifdef __unix__
+	printf("aaaaaaaaaaaa\n");
+#endif	
+	
 	uint16_t i;
 	GolayCW cw,cwlt;
 	cw.CodeWord = 0;
