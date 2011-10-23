@@ -15,8 +15,8 @@ uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTab
 	GolayCW CodeWord1, CodeWord2;
 	CodeWord1.CodeWord = x;
 	CodeWord2.CodeWord = x;
-	//EncodeLT (GOLAY_24, &CodeWord1, EncodeLookupTable);
-	Encode(GOLAY_24, &CodeWord1);
+	EncodeLT (GOLAY_24, &CodeWord1, EncodeLookupTable);
+	//Encode(GOLAY_24, &CodeWord1);
 	CodeWord2.CodeWord = CodeWord1.CodeWord;
 
 	for(i = 1; i <= 3; i++) {
@@ -25,11 +25,11 @@ uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTab
 
 			CodeWord1.CodeWord = CodeWord2.CodeWord ^ error_mask;
 
-      Correction (GOLAY_24, &CodeWord1);
-      if ((test_no%128) == 0) {
+      //Correction (GOLAY_24, &CodeWord1);
+      /*if ((test_no%128) == 0) {
         printf(".");
-      }
-      //DecodeLT (GOLAY_24, &CodeWord1, DecodeLookUpTable);
+      }*/
+      DecodeLT (GOLAY_24, &CodeWord1, DecodeLookUpTable);
 			//error_status = Correction(GOLAY_23, &CodeWord1);
 			if(CodeWord2.CodeWord ^ CodeWord1.CodeWord) {
         		printf ("Mask: %x Something went wrong. Status: %d\n", error_mask, error_status);
@@ -64,10 +64,10 @@ int main(int argc, char** argv) {
   clock_gettime(CLOCK_REALTIME, &startTime);
 #endif
 
-	for(i = 0x000; i<=0xfff; i++) {
-	  printf("Testing codeword %X: ", i);
+	for(i = 0x000; i<=0xff; i++) {
+	  //printf("Testing codeword %X: ", i);
 		Test(i, encLookUp, decLookUp);
-		printf(" Done.\n");
+		//printf(" Done.\n");
 	}
 
 #ifdef __unix__

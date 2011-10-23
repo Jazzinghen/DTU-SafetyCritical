@@ -7,8 +7,8 @@
 #include "headers/decoder.h"
 
 uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
-	FILE *fp_s = fopen(src, "r");
-	FILE *fp_d = fopen(dst, "w");
+	FILE *fp_s = fopen(src, "rb");
+	FILE *fp_d = fopen(dst, "wb");
 
 	if(!fp_s || !fp_d) {
 		return 1;
