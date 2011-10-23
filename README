@@ -1,4 +1,9 @@
-dfdsfds
-cxzcxc
-TEST2 
-TEST3
+This is the project for the “Safety-Critical Embedded Systems” course at DTU.
+It's a simple implementation of the Binary Golay Code, which is a perfect error
+correction code for 24 (or 23) bits codewords with up to 3 wrong bits. We
+implemented both the standard version and the LookUp Table based version.
+
+I'll put here the data I've gotten from the benchmarks.
+
+Average time to compute and write on disk the two LookupTables:
+  
