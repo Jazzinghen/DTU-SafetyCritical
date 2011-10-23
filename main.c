@@ -10,7 +10,7 @@
 int main(int argc, char** argv) {
 
 	uint16_t i;
-	uint8_t test_run = 0;
+	uint32_t test_run = 0;
   double totalAverage = 0;
 
 
@@ -22,14 +22,14 @@ int main(int argc, char** argv) {
 	GolayCW encLookUp[4096];
 	uint32_t decLookUp[2048];
 
-  for (test_run = 0; test_run < TEST_QUANTITY; test_run++) {
-#ifdef __unix__
-  printf("Begin to read/compute LookupTables.\n");
+  printf("Begin LookupTables tests.\n");
 
+  for (test_run = 0; test_run < LOOKUP_QUANTITY; test_run++) {
+#ifdef __unix__
   clock_gettime(CLOCK_REALTIME, &startTime);
 #endif
 
-  LookUpTest(ALWAYES_REMOVE, encLookUp, decLookUp);
+  LookUpTest(LOAD_OR_REMOVE, encLookUp, decLookUp);
 
 #ifdef __unix__
 	clock_gettime(CLOCK_REALTIME, &endTime);
@@ -38,14 +38,13 @@ int main(int argc, char** argv) {
 
   average += timeElapsed.tv_sec * SEC_PER_NSEC + timeElapsed.tv_nsec;
 
-	printf("Tests completed. Time elapsed:\n\t%d seconds\n\t%ld nanoseconds.\n", (int32_t)timeElapsed.tv_sec, timeElapsed.tv_nsec);
+	//printf("Tests completed. Time elapsed:\n\t%d seconds\n\t%ld nanoseconds.\n", (int32_t)timeElapsed.tv_sec, timeElapsed.tv_nsec);
 #endif
   }
 
-  printf("Average Lookup Tables generation time:\n\t%f Nanoseconds.\n", average/TEST_QUANTITY);
+  printf("Average Lookup Tables generation time:\n\t%f Nanoseconds.\n", average/LOOKUP_QUANTITY);
 
   average = 0;
-
 
   for (test_run = 0; test_run < TEST_QUANTITY; test_run++){
 

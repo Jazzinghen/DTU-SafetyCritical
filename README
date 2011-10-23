@@ -5,5 +5,14 @@ implemented both the standard version and the LookUp Table based version.
 
 I'll put here the data I've gotten from the benchmarks.
 
-Average time to compute and write on disk the two LookupTables:
+Average time to compute and write on disk the two Lookup Tables, computed on 10k
+consecutive generations and writings:
   
+  1283458.546 ns
+
+Average time to read the two Lookup Tables from files, computed on 10k
+consecutive readings:
+  
+  86832.1155  ns
+  
+

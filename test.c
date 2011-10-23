@@ -52,8 +52,8 @@ int16_t LookUpTest (uint8_t mode, GolayCW * encodeLookupTable, uint32_t * decode
     res = unlink(ELT_FILE_NAME);
   }
 
-  ComputeELT(GOLAY_24, encodeLookupTable);
-  ComputeDLT(decodeLookUpTable);
+  ComputeELT(MESSAGES_OFF, GOLAY_24, encodeLookupTable);
+  ComputeDLT(MESSAGES_OFF, decodeLookUpTable);
 
   return res;
 }
