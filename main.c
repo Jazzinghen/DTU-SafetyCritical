@@ -7,7 +7,6 @@
 
 uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTable) {
 	uint8_t i;
-	uint32_t test_no = 0;
 	uint32_t error_mask_arr[] = {0x00, 0x01,0x03,0x07, 0x0f};
 	uint32_t error_mask;
 	uint8_t error_status;
@@ -15,21 +14,14 @@ uint8_t Test(uint32_t x, GolayCW * EncodeLookupTable, uint32_t * DecodeLookUpTab
 	GolayCW CodeWord1, CodeWord2;
 	CodeWord1.CodeWord = x;
 	CodeWord2.CodeWord = x;
-	//EncodeLT (GOLAY_24, &CodeWord1, EncodeLookupTable);
-	Encode(GOLAY_24, &CodeWord1);
+	EncodeLT (GOLAY_24, &CodeWord1, EncodeLookupTable);
+	//Encode(GOLAY_24, &CodeWord1);
 	CodeWord2.CodeWord = CodeWord1.CodeWord;
 
 	for(i = 1; i <= 3; i++) {
 		for (error_mask = error_mask_arr[i]; error_mask<0x800000; error_mask=NextBitPermutation(error_mask)) {
-			test_no++;
-
 			CodeWord1.CodeWord = CodeWord2.CodeWord ^ error_mask;
-
-      /*Correction (GOLAY_24, &CodeWord1);
-      if ((test_no%128) == 0) {
-        printf(".");
-      }*/
-      DecodeLT (GOLAY_24, &CodeWord1, DecodeLookUpTable);
+      		DecodeLT (GOLAY_24, &CodeWord1, DecodeLookUpTable);
 			//error_status = Correction(GOLAY_23, &CodeWord1);
 			if(CodeWord2.CodeWord ^ CodeWord1.CodeWord) {
         		printf ("Mask: %x Something went wrong. Status: %d\n", error_mask, error_status);
@@ -48,6 +40,12 @@ int main(int argc, char** argv) {
 	cw.CodeWord = 0;
 	uint32_t tempSyndrome = 0;
 
+	printf("Enc:%d\n", EncodeFile("aaa.txt", "bbb.txt", GOLAY_24));
+	printf("Number of errors injected: %d\n", InjectErrorsFile("bbb.txt", 0));
+	printf("Dec:%d\n", DecodeFile("bbb.txt", "ccc.txt", GOLAY_24));
+	
+	getchar();
+	exit(1);
 #ifdef __unix__
   struct timespec startTime, endTime, timeElapsed;
 #endif
@@ -64,19 +62,15 @@ int main(int argc, char** argv) {
 
   clock_gettime(CLOCK_REALTIME, &startTime);
 #endif
-
-
+	
 	for(i = 0x000; i<=0xfff; i++) {
-	  printf("Testing codeword %X: ", i);
 		Test(i, encLookUp, decLookUp);
-		printf(" Done.\n");
+		//printf(" Done.\n");
 	}
-
 
 #ifdef __unix__
 	clock_gettime(CLOCK_REALTIME, &endTime);
-
-  timeElapsed = ClockDifference(startTime, endTime);
+	timeElapsed = ClockDifference(startTime, endTime);
 	printf("Tests completed. Time elapsed:\n\t%d seconds\n\t%ld nanoseconds.\n", (int32_t)timeElapsed.tv_sec, timeElapsed.tv_nsec);
 #endif
 
