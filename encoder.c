@@ -99,7 +99,7 @@ size_t ComputeELT(uint8_t messages, uint8_t mode, GolayCW * LookupTable) {
   //  If the file exists then we read the Table from it.
   if (LTFile != NULL) {
     if (messages == MESSAGES_ON) {
-      ("Now reading the Encoding Lookup Table: ");
+      printf ("Now reading the Encoding Lookup Table: ");
     };
     res = fread(data, sizeof(uint8_t) * 3, 4096, LTFile);
     for (i = 0; i < 4096; i++){

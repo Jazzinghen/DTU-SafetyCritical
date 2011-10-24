@@ -37,7 +37,7 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 
 		/* Save decoded data in a destination file */
 		fputc((cw1.CodeWord>>4)&0xff, fp_d);
-		fputc((cw1.CodeWord<<4)&0xf0 | (cw2.CodeWord>>8)&0x0f, fp_d);
+		fputc(((cw1.CodeWord<<4)&0xf0) | ((cw2.CodeWord>>8)&0x0f), fp_d);
 		fputc((cw2.CodeWord)   &0xff, fp_d);
 
 		memset(src_data, 0, sizeof(src_data));
@@ -79,7 +79,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
   uint8_t errors = 0;           //  Number of errors encountered
 
   GolayCW tempCW = *codeWord;   //  Variable to store the original CodeWord
-  uint32_t parity_bit;          //  Variable to store the original Parity Bit (Used for 24Bit Golay CodeWords
+  uint32_t parity_bit = 0;      //  Variable to store the original Parity Bit (Used for 24Bit Golay CodeWords
 
   int16_t i;
   int16_t j = -1;               // Used to count trial bit flipping. We set to -1 since we didn't do a single one.
@@ -172,6 +172,8 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
     //  No errors at all, so nothing to fix.
     return (DECODE_NO_ERRORS);
   }
+
+  return (DECODE_FIXED);
 }
 
 size_t ComputeDLT(uint8_t messages, uint32_t * LookupTable) {

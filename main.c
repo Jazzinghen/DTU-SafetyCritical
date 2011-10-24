@@ -6,13 +6,13 @@
 #include "headers/decoder.h"
 #include "headers/test.h"
 
-/*!\brief	
+/*!\brief
  *
- * \param	
- * \param	
- * \param	
+ * \param
+ * \param
+ * \param
  *
- * \retval	
+ * \retval
  */
 int main(int argc, char** argv) {
 	uint16_t i;
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 
 	for(i = 0x000; i <= TEST_TARGET; i++) {
 	  //printf("Testing codeword %X: ", i);
-		TestRun(i, ONTHEFLY_TEST, encLookUp, decLookUp);
+		TestRun(i, LOOKUP_TEST, encLookUp, decLookUp);
 		//printf(" Done.\n");
 	}
 

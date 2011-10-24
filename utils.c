@@ -47,7 +47,7 @@ uint32_t GetSyndrome(uint32_t CodeWord) {
 
 uint32_t RotL(uint32_t CodeWord, int32_t i) {
 	i%=23;
-	CodeWord = (CodeWord << i) | (CodeWord >> 23-i);
+	CodeWord = (CodeWord << i) | (CodeWord >> (23-i));
 	return (CodeWord & 0x7fffff);
 }
 
