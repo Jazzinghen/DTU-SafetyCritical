@@ -107,23 +107,22 @@ uint32_t RotR(uint32_t CodeWord, int32_t i) {
  *			
  * \param	src:		path to the file.
  * \param	mode:		'power' of added noise to the file 
- * 						0: about 0.5  bit error per 1 byte
- *						1: about 1    bit error per 1 byte
- *						2: about 1.4 bit error per 1 byte
- *						3: about 1.5  bit error per 1 byte 
+ *						0: BER~=1/16,
+ *						1: BER~=2/16,
+ * 						2: BER~=3/16, 
  * \retval				number of injected errors
  */
 int32_t InjectErrorsFile (char *src, uint8_t mode) {
-	uint8_t err_mask[4] = {0x10, 0x01, 0x18, 0x11};
+	uint8_t err_mask[3] = {0x10, 0x01, 0x11};
 	uint8_t error_mask; 
 	uint8_t src_data;
 
 	/* open file to read */	
 	FILE *fp_s = fopen(src, "rb+");
-	int32_t ret = 0;
+	int32_t ret = 0;2
 
 	/* Upon not successful open return -1 */
-	if(!fp_s || mode > 3) {
+	if(!fp_s || mode > 2) {
 		return -1;
 	}
 	
