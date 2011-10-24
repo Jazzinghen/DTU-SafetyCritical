@@ -7,13 +7,7 @@
 #include "headers/encoder.h"
 #include "headers/test.h"
 
-/*!\brief	This function calculate Golay CodeWord from 12 bits of data
- *		    stored in a GolayCW structure
- *
- * \param	Parity mode: GOLAY_24 or GOLAY_23
- * \param	Pointer to a codeword
- *
- */
+
 void Encode(uint8_t parity_mode, GolayCW *CodeWord) {
 	CodeWord->cw.check = GetSyndrome(CodeWord->cw.data)&0x7ff;
 	/*
@@ -24,14 +18,6 @@ void Encode(uint8_t parity_mode, GolayCW *CodeWord) {
     }
 }
 
-/*!\brief	This function encode 12 bits of data stored in a GolayCW structure
- *		    by using lookup tables
- *
- * \param	Parity mode: GOLAY_24 or GOLAY_23
- * \param	Pointer to a codeword
- * \param   Pointer to a encoding lookup table
- *
- */
 void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW *LookupTable) {
 	if(parity_mode == GOLAY_24) {
 		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord;
@@ -43,103 +29,11 @@ void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW *LookupTable) {
 	}
 }
 
-/*  This is the function used to compute the Lookup Table for the encoding.
- *
- *  The idea is pretty simple: we just compute the codeword associated to every single 12Bits combination
- *  and then store it using the data as index. When we want to encode a chunk of data we just have to look
- *  for the entire codeword in the Lookup Table.
- *
- *  This function checks also if there is already a Lookup Table File. If this is the case it loads
- *  the Lookup Table in the array. On the other hand, if the file does not exist, then the Lookup Table
- *  is computed and stored both in an external file and in the array.
- *
- *  Bear in mind that it doesn't check whether the file has a correct Lookup Table or not, so if there's
- *  any suspicion that the file is wrong/corrupted simply eliminate it and the function will generate a new
- *  one.
- */
-size_t ComputeELT(uint8_t messages, uint8_t mode, GolayCW * LookupTable) {
-  uint16_t fakeData = 0;
-  uint16_t i = 0;
-  uint16_t j = 0;
-  FILE *LTFile;
-  size_t res;
-
-  union {
-    uint8_t bytes[4];
-    uint32_t cw;
-  } tempData;
-
-  GolayCW tempCW;
-
-  uint8_t data [4096 * 3];
-
-  memset(LookupTable, 0, sizeof(GolayCW) * 4096);
-
-  LTFile = fopen(ELT_FILE_NAME, "rb");
-
-  if (LTFile != NULL) {
-    if (messages == MESSAGES_ON) {
-      ("Now reading the Encoding Lookup Table: ");
-    };
-    res = fread(data, sizeof(uint8_t) * 3, 4096, LTFile);
-    for (i = 0; i < 4096; i++){
-      j = i*3;
-      tempData.cw = 0;
-      tempData.bytes[0] = data[j];
-      tempData.bytes[1] = data[j+1];
-      tempData.bytes[2] = data[j+2];
-      LookupTable[i].CodeWord = tempData.cw;
-      if (mode == GOLAY_23) {
-        LookupTable[i].cw.parity = 0;
-      }
-      if ((i%256) == 0 && messages == MESSAGES_ON) {
-        printf (".");
-      }
-    }
-  } else {
-    if (messages == MESSAGES_ON) {
-      printf("Now generating the Encoding Lookup Table: ");
-    }
-    LTFile = fopen(ELT_FILE_NAME, "wb");
-    for (fakeData = 0; fakeData < 4096; fakeData++) {
-      tempData.cw = 0;
-      tempCW.CodeWord = 0;
-      j = fakeData * 3;
-      tempCW.cw.data = fakeData;
-      Encode(GOLAY_24, &tempCW);
-      LookupTable[fakeData].CodeWord = tempCW.CodeWord;
-      tempData.cw = tempCW.CodeWord;
-
-      data[j] = tempData.bytes[0];
-      data[j+1] = tempData.bytes[1];
-      data[j+2] = tempData.bytes[2];
-
-      if ((fakeData%256) == 0 && messages == MESSAGES_ON) {
-        printf (".");
-      }
-    }
-    res = fwrite(data, sizeof(uint8_t) * 3, 4096, LTFile);
-  }
-  if (messages == MESSAGES_ON) {
-    printf (" Done.\n");
-  }
-	fclose(LTFile);
-  return res;
-}
-
-/*!\brief	This is the function used to encode files
- *
- * \param	src:	path to the source file
- * \param	dst:	path to the destination file
- * \param   mode: 	GOLAY_24 or GOLAY_23
- *
- * \retval	zero if file encoding was successful.
- */
 uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
-	/* open source and destination files */	
+	/* open source and destination files */
 	FILE *fp_s = fopen(src, "rb");
 	FILE *fp_d = fopen(dst, "wb");
- 
+
 	/* Upon not successful open return 1 */
 	if(!fp_s || !fp_d) {
 		return 1;
@@ -178,4 +72,85 @@ uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
 	fclose(fp_d);
 
 	return 0;
+}
+
+size_t ComputeELT(uint8_t messages, uint8_t mode, GolayCW * LookupTable) {
+  uint16_t fakeData = 0;    //  Fake data used to generate the entire codeword
+  uint16_t i = 0;
+  uint16_t j = 0;
+  FILE *LTFile;             //  File descriptor for the Lookup Table File
+  size_t res;               //  Result of fwrite/fread
+
+  union {
+    uint8_t bytes[4];
+    uint32_t cw;
+  } tempData;               //  Union used to store an entire error mask and then split it into bytes.
+
+  GolayCW tempCW;           //  Temporary CodeWord used for the generation
+
+  uint8_t data [4096 * 3];  //  Temporary array used for file operations
+
+  //  We first run a memset over the Lookup Table, we don't want any garbage data.
+  memset(LookupTable, 0, sizeof(GolayCW) * 4096);
+
+  //  Try to open the file ("rb" is used for Windows compatibility)
+  LTFile = fopen(ELT_FILE_NAME, "rb");
+
+  //  If the file exists then we read the Table from it.
+  if (LTFile != NULL) {
+    if (messages == MESSAGES_ON) {
+      ("Now reading the Encoding Lookup Table: ");
+    };
+    res = fread(data, sizeof(uint8_t) * 3, 4096, LTFile);
+    for (i = 0; i < 4096; i++){
+      j = i*3;
+      tempData.cw = 0;
+      tempData.bytes[0] = data[j];
+      tempData.bytes[1] = data[j+1];
+      tempData.bytes[2] = data[j+2];
+      LookupTable[i].CodeWord = tempData.cw;
+      //  If we are working with 23-bit Golay CodeWords, then we don't need the Parity bit
+      if (mode == GOLAY_23) {
+        LookupTable[i].cw.parity = 0;
+      }
+      if ((i%256) == 0 && messages == MESSAGES_ON) {
+        printf (".");
+      }
+    }
+  } else {
+    if (messages == MESSAGES_ON) {
+      printf("Now generating the Encoding Lookup Table: ");
+    }
+    //  If the file does not exist then we have to create it.
+    LTFile = fopen(ELT_FILE_NAME, "wb");
+    //  For every single possibile chunk of 12-bits data, from 0x0 to 0xFFF
+    for (fakeData = 0; fakeData < 4096; fakeData++) {
+      tempData.cw = 0;
+      tempCW.CodeWord = 0;
+      j = fakeData * 3;
+      tempCW.cw.data = fakeData;
+      //  We compute the Codeword for that data. We use GOLAY_24 and not “method” since
+      //  we can always ignore the Parity bit when reading the Table or when doing any
+      //  Operation and because packing 24 bits codewords (3 bytes) instead of 23 is easier.
+      Encode(GOLAY_24, &tempCW);
+      //  And then we put it in the Lookup Table using the data itself as index.
+      LookupTable[fakeData].CodeWord = tempCW.CodeWord;
+      tempData.cw = tempCW.CodeWord;
+
+      data[j] = tempData.bytes[0];
+      data[j+1] = tempData.bytes[1];
+      data[j+2] = tempData.bytes[2];
+
+      if ((fakeData%256) == 0 && messages == MESSAGES_ON) {
+        printf (".");
+      }
+    }
+    //  In the end we write all the Codewords
+    res = fwrite(data, sizeof(uint8_t) * 3, 4096, LTFile);
+  }
+  if (messages == MESSAGES_ON) {
+    printf (" Done.\n");
+  }
+	fclose(LTFile);
+  return res;
 }

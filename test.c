@@ -1,4 +1,6 @@
 #include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "headers/test.h"
 #include "headers/decoder.h"
@@ -37,25 +39,54 @@ uint8_t TestRun (uint32_t data, uint8_t mode, GolayCW * encodeLookupTable, uint3
 			if(CodeWord2.CodeWord ^ CodeWord1.CodeWord) {
         		printf ("Mask: %x Something went wrong. Status: %d\n", error_mask, error_status);
         		PrintBinary(CodeWord2.CodeWord ^ CodeWord1.CodeWord);
-				return 1;
+				return TEST_FAILED;
 			}
 		}
 	}
-	return 0;
+	return TEST_SUCCESFUL;
 }
 
-int16_t LookUpTest (uint8_t mode, GolayCW * encodeLookupTable, uint32_t * decodeLookUpTable){
-  int16_t res;
+size_t LookUpTest (uint8_t mode, GolayCW * encodeLookupTable, uint32_t * decodeLookUpTable){
+  size_t res;
 
-  if (mode == ALWAYES_REMOVE) {
-    res = unlink(DLT_FILE_NAME);
-    res = unlink(ELT_FILE_NAME);
+  if (mode == ALWAYS_REMOVE) {
+    unlink(DLT_FILE_NAME);
+    unlink(ELT_FILE_NAME);
   }
 
-  ComputeELT(MESSAGES_OFF, GOLAY_24, encodeLookupTable);
-  ComputeDLT(MESSAGES_OFF, decodeLookUpTable);
+  res = ComputeELT(MESSAGES_OFF, GOLAY_24, encodeLookupTable);
+  res = ComputeDLT(MESSAGES_OFF, decodeLookUpTable);
 
   return res;
+}
+
+int32_t InjectErrorsFile (char *src, uint8_t mode) {
+	uint8_t err_mask[4] = {0x10, 0x01, 0x18, 0x11};
+	uint8_t error_mask;
+	uint8_t src_data;
+
+	/* open file to read */
+	FILE *fp_s = fopen(src, "rb+");
+	int32_t ret = 0;
+
+	/* Upon not successful open return -1 */
+	if(!fp_s || mode > 3) {
+		return -1;
+	}
+
+	/* Read file byte by byte */
+	while(fread(&src_data, 1, 1, fp_s)) {
+		fseek ( fp_s , -1 , SEEK_CUR );
+		error_mask = err_mask[mode]<<(rand()%8);
+		/* add to the readed value some random noise */
+		fputc(src_data ^ error_mask, fp_s);
+		ret+=Weight(error_mask);
+		fseek ( fp_s ,  0 , SEEK_CUR );
+		memset(&src_data, 0, sizeof(src_data));
+	}
+	/* Close the file */
+	fclose(fp_s);
+	return ret;
 }
 
 #ifdef __unix__
