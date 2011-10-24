@@ -48,11 +48,10 @@ uint32_t EncodeFile(char *src, char *dst, uint8_t mode);
  *  one.
  *
  *  \param message:     Wheter we want some informations printed on screen or not. Either MESSAGES_ON or MESSAGES_OFF
- *  \param mode:        Whether we are using 23 or 24 bits Golay Codewords. Either GOLAY_23 or GOLAY_24
  *  \param LookupTable: Pointer to the Encoding Lookup Table
  *
  *  \return The result of the file operations inside the function.
  */
-size_t  ComputeELT(uint8_t message, uint8_t mode, GolayCW * LookupTable);
+size_t  ComputeELT(uint8_t message, GolayCW * LookupTable);
 
 #endif // ENCODER_H_INCLUDED

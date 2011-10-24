@@ -62,7 +62,7 @@ size_t LookUpTest (uint8_t mode, GolayCW * encodeLookupTable, uint32_t * decodeL
   }
 
   //  Compute or Load the two Tables
-  res = ComputeELT(MESSAGES_OFF, GOLAY_24, encodeLookupTable);
+  res = ComputeELT(MESSAGES_OFF, encodeLookupTable);
   res = ComputeDLT(MESSAGES_OFF, decodeLookUpTable);
 
   return res;

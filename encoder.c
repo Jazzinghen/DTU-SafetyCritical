@@ -22,11 +22,11 @@ void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW *LookupTable) {
 	if(parity_mode == GOLAY_24) {
 		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord;
 	} else {
-		/*
-	 	 * Remove parity bit from lookup table if needed
-	 	 */
-		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord & 0x7fffff;
-	}
+    /*
+     * In case of 23 Bits Golay Codewords we reset the parity bit
+     */
+    CodeWord->cw.parity = 0;
+  }
 }
 
 uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
@@ -74,7 +74,7 @@ uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
 	return 0;
 }
 
-size_t ComputeELT(uint8_t messages, uint8_t mode, GolayCW * LookupTable) {
+size_t ComputeELT(uint8_t messages, GolayCW * LookupTable) {
   uint16_t fakeData = 0;    //  Fake data used to generate the entire codeword
   uint16_t i = 0;
   uint16_t j = 0;
@@ -109,10 +109,6 @@ size_t ComputeELT(uint8_t messages, uint8_t mode, GolayCW * LookupTable) {
       tempData.bytes[1] = data[j+1];
       tempData.bytes[2] = data[j+2];
       LookupTable[i].CodeWord = tempData.cw;
-      //  If we are working with 23-bit Golay CodeWords, then we don't need the Parity bit
-      if (mode == GOLAY_23) {
-        LookupTable[i].cw.parity = 0;
-      }
       if ((i%256) == 0 && messages == MESSAGES_ON) {
         printf (".");
       }
