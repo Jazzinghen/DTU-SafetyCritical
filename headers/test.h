@@ -5,9 +5,9 @@
 
 #include "utils.h"
 
-#define TEST_QUANTITY       10
-#define LOOKUP_QUANTITY     1
-#define TEST_TARGET         0xFFF
+#define TEST_QUANTITY       10          //  Quantity of consecutive Bruteforcing tests
+#define LOOKUP_QUANTITY     1           //  Quantity of consecutive Lookup Table Generation/Loading tests
+#define TEST_TARGET         0xFFF       //  Target Data Chunk (From 0x0 to TEST_TARGET)
 #define SEC_PER_NSEC        1000000000
 
 #define LOOKUP_TEST         0
@@ -36,7 +36,7 @@
  *  \param  encodeLookupTable:  Pointer to the Encoding Lookup Table
  *  \param  decodeLookupTable:  Pointer to the Decodification Lookup Table
  *
- *  \retval The result of the test. Either TEST_SUCCESSFUL or TEST_FAILED
+ *  \return The result of the test. Either TEST_SUCCESSFUL or TEST_FAILED
  */
 uint8_t TestRun (uint32_t data, uint8_t mode, GolayCW * encodeLookupTable, uint32_t * decodeLookUpTable);
 
@@ -49,7 +49,7 @@ uint8_t TestRun (uint32_t data, uint8_t mode, GolayCW * encodeLookupTable, uint3
  *  \param  encodeLookupTable:  Pointer to the Encoding Lookup Table
  *  \param  decodeLookupTable:  Pointer to the Decodification Lookup Table
  *
- *  \retval The result of the file operations inside the Test
+ *  \return The result of the file operations inside the Test
  */
 size_t LookUpTest (uint8_t mode, GolayCW * encodeLookupTable, uint32_t * decodeLookUpTable);
 
@@ -67,6 +67,18 @@ size_t LookUpTest (uint8_t mode, GolayCW * encodeLookupTable, uint32_t * decodeL
 int32_t InjectErrorsFile (char *src, uint8_t mode);
 
 #ifdef __unix__
+/** \brief Function to compute the difference between to timespec structures.
+ *
+ *  The timespec structure is a time.h sctructure used to get high resolution times by using one of the system's
+ *  timers, such as the System wide Real Time Clock. Since the structure has a variable for the seconds and a
+ *  variable for the nanoseconds we need a specific function to get the difference between two high resolution
+ *  times.
+ *
+ *  \param  begin:  Beginning time structure
+ *  \param  end:    Ending time structure
+ *
+ *  \return The difference between the two times
+ */
 struct timespec ClockDifference (struct timespec begin, struct timespec end);
 #endif
 

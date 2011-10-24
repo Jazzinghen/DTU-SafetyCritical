@@ -29,6 +29,14 @@ void DecodeLT (uint8_t mode, GolayCW *CodeWord, uint32_t *LookupTable);
  *  detect up to 6 bits of errors and any number of odd bits of error, in any pattern.
  *
  *  It has been designed to work with both 23 Bits and 24 Bits Golay CodeWords.
+ *
+ *  \param parity_mode: Whether we are using 23 or 24 bits Golay Codewords. Either GOLAY_23 or GOLAY_24
+ *  \param *codeWord:   The pointer to the structure we have to check.
+ *
+ *  \return The result of the check.
+ *  \retval DECODE_NO_ERRORS        No errors found in the codeword
+ *  \retval DECODE_PARITY_ERRORS    Parity check failed
+ *  \retval DECODE_SYNDROME_ERRORS  Syndrome different from 0
  */
 uint8_t ErrorCheck (uint8_t parity_mode, GolayCW *codeWord);
 
@@ -41,6 +49,14 @@ uint8_t ErrorCheck (uint8_t parity_mode, GolayCW *codeWord);
  *
  *  It has beed designed to work with both 23 and 24 Bits version of Golay CodeWords, we have
  *  just to ignore the Parity bit in the case of 23 bits.
+ *
+ *  \param parity_mode: Whether we are using 23 or 24 bits Golay Codewords. Either GOLAY_23 or GOLAY_24
+ *  \param *codeWord:   The pointer to the structure we have to correct.
+ *
+ *  \return The result of the correction.
+ *  \retval DECODE_NO_ERRORS      The Codeword was correct.
+ *  \retval DECODE_PARITY_ERRORS  The Codeword did not pass the Parity check after correction
+ *  \retval DECODE_FIXED          The Codeword was fixed.
  */
 uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord);
 
@@ -58,6 +74,11 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord);
  *  Bear in mind that it doesn't check whether the file has a correct Lookup Table or not, so if there's
  *  any suspicion that the file is wrong/corrupted simply eliminate it and the function will generate a new
  *  one.
+ *
+ *  \param message:     Wheter we want some informations printed on screen or not. Either MESSAGES_ON or MESSAGES_OFF
+ *  \param LookupTable: Pointer to the Decoding Lookup Table
+ *
+ *  \return The result of the file operations inside the function.
  */
 size_t ComputeDLT (uint8_t message, uint32_t * LookupTable);
 
