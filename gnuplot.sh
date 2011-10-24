@@ -9,5 +9,7 @@ set title "Correction times"
 set xlabel "Codewords"
 set ylabel "Time (in nanoseconds)"
 set key left top
+set terminal png small size 800,600 enhance
+set output 'EncodingDecodingTimes.png'
 
 replot

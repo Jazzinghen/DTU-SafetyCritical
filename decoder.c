@@ -118,39 +118,41 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
       syndrome = (GetSyndrome(codeWord->CodeWord) << 12);
       //  If there are errors
       if (syndrome > 0) {
-      /*  We will have then to begin to test every single shift of the 23 possible (Since a Golay Codeword
-       *  is made of [12 bits of data, 11 bits of checksum].
-       *  We could relay on the strength of the algorithm, since, in theory, every single 23 bit CodeWord maps
-       *  to exactly one correct Golay Codeword, but it's always better to put a limit to te computations, so
-       *  we will do EXACTLY 23 shifts.
-       */
-      for (i=0; i<23; i++) {
-            if ((errors = Weight(syndrome)) <= limitWeight) {
-                //  If the number of errors is less then or limit we remove them
-                codeWord->CodeWord = codeWord->CodeWord ^ syndrome;
-                //  And restore the position of the bits.
-                codeWord->CodeWord = RotR(codeWord->CodeWord, i);
-                if (parity_mode == GOLAY_24){
-                  codeWord->cw.parity = parity_bit;
-                  if (GetParity(codeWord->CodeWord) > 0){            /* odd parity is an error */
-                    return(DECODE_PARITY_ERRORS);
+        /*  We will have then to begin to test every single shift of the 23 possible (Since a Golay Codeword
+         *  is made of [12 bits of data, 11 bits of checksum].
+         *  We could relay on the strength of the algorithm, since, in theory, every single 23 bit CodeWord maps
+         *  to exactly one correct Golay Codeword, but it's always better to put a limit to te computations, so
+         *  we will do EXACTLY 23 shifts.
+         */
+        for (i=0; i<23; i++) {
+              if ((errors = Weight(syndrome)) <= limitWeight) {
+                  //  If the number of errors is less then or limit we remove them
+                  codeWord->CodeWord = codeWord->CodeWord ^ syndrome;
+                  //  And restore the position of the bits.
+                  codeWord->CodeWord = RotR(codeWord->CodeWord, i);
+                  if (parity_mode == GOLAY_24){
+                    codeWord->cw.parity = parity_bit;
+                    // If we have a one here then there's an error.
+                    if (GetParity(codeWord->CodeWord) > 0){
+                      return(DECODE_PARITY_ERRORS);
+                    }
                   }
+                  return(DECODE_FIXED);
                 }
-                return(DECODE_FIXED);
-              }
-            else
-              {
-                //  If that was not the correct one we rotate the Codeword and compute the new Syndrome
-                codeWord->CodeWord = RotL(codeWord->CodeWord,1);
-                syndrome = (GetSyndrome(codeWord->CodeWord) << 12);
-              }
-          }
+              else
+                {
+                  //  If that was not the correct one we rotate the Codeword and compute the new Syndrome
+                  codeWord->CodeWord = RotL(codeWord->CodeWord,1);
+                  syndrome = (GetSyndrome(codeWord->CodeWord) << 12);
+                }
+            }
 
-        j++;
+          j++;
       } else {
         //  If there are no errors we just have to check if there are parity errors if we are working with 24Bits CodeWords
         if (parity_mode == GOLAY_24){
           codeWord->cw.parity = parity_bit;
+          // If we have a one here then there's an error.
           if (GetParity(codeWord->CodeWord) > 0){
             return(DECODE_PARITY_ERRORS);
           }
@@ -165,6 +167,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
     if (parity_mode == GOLAY_24){
       //  We will have to restore the parity bit.
       tempCW.cw.parity = parity_bit;
+      // If we have a one here then there's an error.
       if (GetParity(codeWord->CodeWord) > 0){
         return(DECODE_PARITY_ERRORS);
       }
