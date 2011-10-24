@@ -30,3 +30,9 @@ Average time per codeword using On-The-Fly correction, computed using
 10 * 4096 * 2048 consecutive words with errors (1~3 bits):
 
   8711.27     ns
+  
+  This huge difference (40x from the Lookup Table computation) is due to a
+  fact:
+  
+  - The correction algorithm is made of TWO 0..23 nested fors. This leads to a
+    worst case scenario of 576 computations. It still is constant, nonetheless.
