@@ -16,9 +16,11 @@
  * \retval	zero if file decoding was successful.
  */
 uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
+	/* open source and destination files */	
 	FILE *fp_s = fopen(src, "rb");
 	FILE *fp_d = fopen(dst, "wb");
 
+	/* Upon not successful open return 1 */
 	if(!fp_s || !fp_d) {
 		return 1;
 	}
@@ -26,7 +28,9 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 	GolayCW cw1, cw2;
 	uint8_t src_data[6]={0};
 
+	/* Everytime read from file 6 bytes of data to decode */
 	while(fread(src_data, 1, 6, fp_s)) {
+		/* 6 bytes of data = 8*6 bits = 48 bits = 2*24 bits = 2*CodeWord */
 		cw1.CodeWord  = (src_data[0]);
 		cw1.CodeWord |= (src_data[1])<<8;
 		cw1.CodeWord |= (src_data[2])<<16;
@@ -35,9 +39,11 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 		cw2.CodeWord |= (src_data[4])<<8;
 		cw2.CodeWord |= (src_data[5])<<16;
 
+		/* Decode our two codewords */
 		Correction(mode, &cw1);
 		Correction(mode, &cw2);
 
+		/* Save decoded data in a destination file */
 		fputc((cw1.CodeWord>>4)&0xff, fp_d);
 		fputc((cw1.CodeWord<<4)&0xf0 | (cw2.CodeWord>>8)&0x0f, fp_d);
 		fputc((cw2.CodeWord)   &0xff, fp_d);
@@ -45,6 +51,7 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 		memset(src_data, 0, sizeof(src_data));
 	}
 
+	/* Close files */
 	fclose(fp_s);
 	fclose(fp_d);
 

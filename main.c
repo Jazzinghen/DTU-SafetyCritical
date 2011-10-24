@@ -15,11 +15,10 @@
  * \retval	
  */
 int main(int argc, char** argv) {
-
 	uint16_t i;
 
 	uint32_t test_run = 0;
-  double totalAverage = 0;
+	double totalAverage = 0;
 
 	printf("Enc:%d\n", EncodeFile("aaa.txt", "bbb.txt", GOLAY_24));
 	printf("Number of errors injected: %d\n", InjectErrorsFile("bbb.txt", 0));

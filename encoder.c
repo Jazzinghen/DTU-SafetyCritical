@@ -16,6 +16,9 @@
  */
 void Encode(uint8_t parity_mode, GolayCW *CodeWord) {
 	CodeWord->cw.check = GetSyndrome(CodeWord->cw.data)&0x7ff;
+	/*
+	 * Add parity bit if needed
+	 */
 	if (parity_mode == GOLAY_24){
 		CodeWord->cw.parity = GetParity(CodeWord->CodeWord);
     }
@@ -33,6 +36,9 @@ void EncodeLT (uint8_t parity_mode, GolayCW *CodeWord, GolayCW *LookupTable) {
 	if(parity_mode == GOLAY_24) {
 		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord;
 	} else {
+		/*
+	 	 * Remove parity bit from lookup table if needed
+	 	 */
 		CodeWord->CodeWord = LookupTable[CodeWord->cw.data].CodeWord & 0x7fffff;
 	}
 }
@@ -130,9 +136,11 @@ size_t ComputeELT(uint8_t messages, uint8_t mode, GolayCW * LookupTable) {
  * \retval	zero if file encoding was successful.
  */
 uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
-	FILE *fp_s = fopen(src, "r");
-	FILE *fp_d = fopen(dst, "w");
-
+	/* open source and destination files */	
+	FILE *fp_s = fopen(src, "rb");
+	FILE *fp_d = fopen(dst, "wb");
+ 
+	/* Upon not successful open return 1 */
 	if(!fp_s || !fp_d) {
 		return 1;
 	}
@@ -140,16 +148,20 @@ uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
 	GolayCW cw1,cw2;
 	uint8_t src_data[3]={0};
 
+	/* Everytime read from file 3 bytes of data to encode */
 	while(fread(src_data, 1, 3, fp_s)) {
+		/* 3 bytes of data = 8*3 bits = 24 bits = 12*2 bits = 2*CodeWord.data */
 		cw1.CodeWord  =  (src_data[0]<<4);
 		cw1.CodeWord |=  (src_data[1]>>4)&0x00f;
 
 		cw2.CodeWord  =  (src_data[1]<<8)&0xf00;
 		cw2.CodeWord |=  (src_data[2]);
 
+		/* Encode our two codewords */
 		Encode(mode, &cw1);
 		Encode(mode, &cw2);
 
+		/* Save encoded codewords in a file */
 		fputc( cw1.CodeWord     &0xff,fp_d);
 		fputc((cw1.CodeWord>>8) &0xff,fp_d);
 		fputc((cw1.CodeWord>>16)&0xff,fp_d);
@@ -161,6 +173,7 @@ uint32_t EncodeFile(char *src, char *dst, uint8_t mode) {
 		memset(src_data, 0, sizeof(src_data));
 	}
 
+	/* Close file descrpytors */
 	fclose(fp_s);
 	fclose(fp_d);
 

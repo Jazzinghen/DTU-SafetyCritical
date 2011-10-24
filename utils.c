@@ -80,7 +80,7 @@ uint32_t GetSyndrome(uint32_t CodeWord) {
  *          23 bit long word by n bits to the left
  *			
  * \param	CodeWord: a word to rotate
- * \param	i:		  times of rotation
+ * \param	i:		  number of rotation
  * \retval			  result of rotation
  */
 uint32_t RotL(uint32_t CodeWord, int32_t i) {
@@ -93,7 +93,7 @@ uint32_t RotL(uint32_t CodeWord, int32_t i) {
  *          23 bit long word by n bits to the right
  *			
  * \param	CodeWord: a word to rotate
- * \param	i:		  times of rotation
+ * \param	i:		  number of rotation
  * \retval			  result of rotation
  */
 uint32_t RotR(uint32_t CodeWord, int32_t i) {
@@ -102,26 +102,42 @@ uint32_t RotR(uint32_t CodeWord, int32_t i) {
 	return (CodeWord & 0x7fffff);
 }
 
+/*!\brief	This is the function used to rotate with carry 
+ *          23 bit long word by n bits to the right
+ *			
+ * \param	src:		path to the file.
+ * \param	mode:		'power' of added noise to the file 
+ * 						0: about 0.5  bit error per 1 byte
+ *						1: about 1    bit error per 1 byte
+ *						2: about 1.4 bit error per 1 byte
+ *						3: about 1.5  bit error per 1 byte 
+ * \retval				number of injected errors
+ */
 int32_t InjectErrorsFile (char *src, uint8_t mode) {
+	uint8_t err_mask[4] = {0x10, 0x01, 0x18, 0x11};
+	uint8_t error_mask; 
+	uint8_t src_data;
+
+	/* open file to read */	
 	FILE *fp_s = fopen(src, "rb+");
 	int32_t ret = 0;
 
+	/* Upon not successful open return -1 */
 	if(!fp_s || mode > 3) {
 		return -1;
 	}
 	
-	uint8_t err_mask[4] = {0x10, 0x01, 0x88, 0x11};
-	uint8_t error_mask; 
-	uint8_t src_data;
+	/* Read file byte by byte */
 	while(fread(&src_data, 1, 1, fp_s)) {
 		fseek ( fp_s , -1 , SEEK_CUR );
 		error_mask = err_mask[mode]<<(rand()%8);
+		/* add to the readed value some random noise */
 		fputc(src_data ^ error_mask, fp_s);
 		ret+=Weight(error_mask);
 		fseek ( fp_s ,  0 , SEEK_CUR );
 		memset(&src_data, 0, sizeof(src_data));
 	}
-	
+	/* Close the file */
 	fclose(fp_s);
 	return ret;
 }
