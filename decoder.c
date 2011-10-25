@@ -7,16 +7,8 @@
 #include "headers/decoder.h"
 #include "headers/test.h"
 
-/*!\brief	This is the function used to decode files
- *
- * \param	src:	path to the source file
- * \param	dst:	path to the destination file
- * \param   mode: 	GOLAY_24 or GOLAY_23
- *
- * \retval	zero if file decoding was successful.
- */
 uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
-	/* open source and destination files */	
+	/* open source and destination files */
 	FILE *fp_s = fopen(src, "rb");
 	FILE *fp_d = fopen(dst, "wb");
 
@@ -45,7 +37,7 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 
 		/* Save decoded data in a destination file */
 		fputc((cw1.CodeWord>>4)&0xff, fp_d);
-		fputc((cw1.CodeWord<<4)&0xf0 | (cw2.CodeWord>>8)&0x0f, fp_d);
+		fputc(((cw1.CodeWord<<4)&0xf0) | ((cw2.CodeWord>>8)&0x0f), fp_d);
 		fputc((cw2.CodeWord)   &0xff, fp_d);
 
 		memset(src_data, 0, sizeof(src_data));
@@ -58,23 +50,9 @@ uint8_t DecodeFile (char *src, char *dst, uint8_t mode) {
 	return 0;
 }
 
-/*!\brief	This function decode Golay CodeWords by using lookup tables
- *
- * \param	Parity mode: GOLAY_24 or GOLAY_23
- * \param	Pointer to a codeword
- * \param   Pointer to a decoding lookup table
- *
- */
 void DecodeLT (uint8_t mode, GolayCW *CodeWord, uint32_t *LookupTable) {
 	CodeWord->CodeWord = CodeWord->CodeWord ^ LookupTable[GetSyndrome(CodeWord->CodeWord&0x7fffff)];
 }
-
-/*  This is the function used to check whether a Golay Codeword is correct or not.
- *  It can be used to check whether there have been errors and, by definition, can
- *  detect up to 6 bits of errors and any number of odd bits of error, in any pattern.
- *
- *  It has been designed to work with both 23 Bits and 24 Bits Golay CodeWords.
- */
 
 uint8_t ErrorCheck (uint8_t parity_mode, GolayCW *codeWord){
 
@@ -93,15 +71,6 @@ uint8_t ErrorCheck (uint8_t parity_mode, GolayCW *codeWord){
   }
 }
 
-/*  This function used to correct a Golay Codeword. If there are less than 4 wrong bits, in
- *  any pattern, then this function can detect and fix the error. If there are more errors, then
- *  the function will return a correct Golay Codeword but there is a great probability that
- *  it won't be the original one.
- *
- *  It has beed designed to work with both 23 and 24 Bits version of Golay CodeWords, we have
- *  just to ignore the Parity bit in the case of 23 bits.
- */
-
 uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
 {
   uint32_t mask = 1;            //  Mask for bit flipping
@@ -110,7 +79,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
   uint8_t errors = 0;           //  Number of errors encountered
 
   GolayCW tempCW = *codeWord;   //  Variable to store the original CodeWord
-  uint32_t parity_bit;          //  Variable to store the original Parity Bit (Used for 24Bit Golay CodeWords
+  uint32_t parity_bit = 0;      //  Variable to store the original Parity Bit (Used for 24Bit Golay CodeWords
 
   int16_t i;
   int16_t j = -1;               // Used to count trial bit flipping. We set to -1 since we didn't do a single one.
@@ -128,12 +97,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
       tempCW.cw.parity = 0;
     }
 
-    /*  We will have then to begin to test every single shift of the 23 possible (Since a Golay Codeword
-     *  is made of [12 bits of data, 11 bits of checksum].
-     *  We could relay on the strength of the algorithm, since, in theory, every single 23 bit CodeWord maps
-     *  to exactly one correct Golay Codeword, but it's always better to put a limit to te computations, so
-     *  we will do EXACTLY 23 shifts.
-     */
+    //  We'll test every trial bit until we find a correct Codeword
     while (j < 23) {
 
       //  If we are toggling trial bits
@@ -154,34 +118,41 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
       syndrome = (GetSyndrome(codeWord->CodeWord) << 12);
       //  If there are errors
       if (syndrome > 0) {
-        //  We do at most 23 shifts to find a correct Golay word, since we know there is one
+        /*  We will have then to begin to test every single shift of the 23 possible (Since a Golay Codeword
+         *  is made of [12 bits of data, 11 bits of checksum].
+         *  We could relay on the strength of the algorithm, since, in theory, every single 23 bit CodeWord maps
+         *  to exactly one correct Golay Codeword, but it's always better to put a limit to te computations, so
+         *  we will do EXACTLY 23 shifts.
+         */
         for (i=0; i<23; i++) {
-            if ((errors = Weight(syndrome)) <= limitWeight) {
-                //  If the number of errors is less then or limit we remove them
-                codeWord->CodeWord = codeWord->CodeWord ^ syndrome;
-                //  And restore the position of the bits.
-                codeWord->CodeWord = RotR(codeWord->CodeWord, i);
-                if (parity_mode == GOLAY_24){
-                  codeWord->cw.parity = parity_bit;
-                  if (GetParity(codeWord->CodeWord) > 0){            /* odd parity is an error */
-                    return(DECODE_PARITY_ERRORS);
+              if ((errors = Weight(syndrome)) <= limitWeight) {
+                  //  If the number of errors is less then or limit we remove them
+                  codeWord->CodeWord = codeWord->CodeWord ^ syndrome;
+                  //  And restore the position of the bits.
+                  codeWord->CodeWord = RotR(codeWord->CodeWord, i);
+                  if (parity_mode == GOLAY_24){
+                    codeWord->cw.parity = parity_bit;
+                    // If we have a one here then there's an error.
+                    if (GetParity(codeWord->CodeWord) > 0){
+                      return(DECODE_PARITY_ERRORS);
+                    }
                   }
+                  return(DECODE_FIXED);
                 }
-                return(DECODE_FIXED);
-              }
-            else
-              {
-                //  If that was not the correct one we rotate the Codeword and compute the new Syndrome
-                codeWord->CodeWord = RotL(codeWord->CodeWord,1);
-                syndrome = (GetSyndrome(codeWord->CodeWord) << 12);
-              }
-          }
+              else
+                {
+                  //  If that was not the correct one we rotate the Codeword and compute the new Syndrome
+                  codeWord->CodeWord = RotL(codeWord->CodeWord,1);
+                  syndrome = (GetSyndrome(codeWord->CodeWord) << 12);
+                }
+            }
 
-        j++;
+          j++;
       } else {
         //  If there are no errors we just have to check if there are parity errors if we are working with 24Bits CodeWords
         if (parity_mode == GOLAY_24){
           codeWord->cw.parity = parity_bit;
+          // If we have a one here then there's an error.
           if (GetParity(codeWord->CodeWord) > 0){
             return(DECODE_PARITY_ERRORS);
           }
@@ -196,6 +167,7 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
     if (parity_mode == GOLAY_24){
       //  We will have to restore the parity bit.
       tempCW.cw.parity = parity_bit;
+      // If we have a one here then there's an error.
       if (GetParity(codeWord->CodeWord) > 0){
         return(DECODE_PARITY_ERRORS);
       }
@@ -203,22 +175,9 @@ uint8_t Correction (uint8_t parity_mode, GolayCW *codeWord)
     //  No errors at all, so nothing to fix.
     return (DECODE_NO_ERRORS);
   }
-}
 
-/*  This is the function used to compute the Lookup Table for the decoding.
- *  The idea is simple: we generate the position of all the possible errors (up to 3 bits, however, since
- *  over that quantity it's not possible to do a proper correction) and then we store them in the
- *  Lookup Table using the syndrome generated by the errors as index. These are stored in an array of
- *  Unsigned 32-bit integers.
- *
- *  This function checks also if there is already a Lookup Table File. If this is the case it loads
- *  the Lookup Table in the array. On the other hand, if the file does not exist, then the Lookup Table
- *  is computed and stored both in an external file and in the array.
- *
- *  Bear in mind that it doesn't check whether the file has a correct Lookup Table or not, so if there's
- *  any suspicion that the file is wrong/corrupted simply eliminate it and the function will generate a new
- *  one.
- */
+  return (DECODE_FIXED);
+}
 
 size_t ComputeDLT(uint8_t messages, uint32_t * LookupTable) {
 
