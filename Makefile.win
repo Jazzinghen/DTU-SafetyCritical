@@ -1,0 +1,42 @@
+# Project: Project1
+# Makefile created by Dev-C++ 4.9.9.2
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = 
+OBJ  = gg/decoder.o gg/encoder.o gg/main.o gg/test.o gg/utils.o $(RES)
+LINKOBJ  = gg/decoder.o gg/encoder.o gg/main.o gg/test.o gg/utils.o $(RES)
+LIBS =  -L"C:/Users/Filip/Dev-Cpp/lib"  
+INCS =  -I"C:/Users/Filip/Dev-Cpp/include" 
+CXXINCS =  -I"C:/Users/Filip/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"C:/Users/Filip/Dev-Cpp/include/c++/3.4.2/backward"  -I"C:/Users/Filip/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"C:/Users/Filip/Dev-Cpp/include/c++/3.4.2"  -I"C:/Users/Filip/Dev-Cpp/include" 
+BIN  = Project1.exe
+CXXFLAGS = $(CXXINCS)  
+CFLAGS = $(INCS)  
+RM = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before Project1.exe all-after
+
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o "Project1.exe" $(LIBS)
+
+gg/decoder.o: gg/decoder.c
+	$(CC) -c gg/decoder.c -o gg/decoder.o $(CFLAGS)
+
+gg/encoder.o: gg/encoder.c
+	$(CC) -c gg/encoder.c -o gg/encoder.o $(CFLAGS)
+
+gg/main.o: gg/main.c
+	$(CC) -c gg/main.c -o gg/main.o $(CFLAGS)
+
+gg/test.o: gg/test.c
+	$(CC) -c gg/test.c -o gg/test.o $(CFLAGS)
+
+gg/utils.o: gg/utils.c
+	$(CC) -c gg/utils.c -o gg/utils.o $(CFLAGS)
